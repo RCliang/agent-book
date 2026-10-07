@@ -1,0 +1,130 @@
+<!-- ▸ c30a · 多智能体系统:架构与协调 -->
+<section class="slide" id="c30a" data-part="5" data-crumb="PART V · CH 25" data-title="多智能体:架构与协调">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 25</span><span class="dim">书 p443-462</span><span class="tag c">Supervisor</span><span class="tag c">Stigmergy</span></div>
+    <h2 class="k-h">多智能体系统<span class="en">ARCHITECTURE · COORDINATION · ROLES</span></h2>
+    <p class="k-lede">单个 LLM 再大也是通才,也是单点故障。专门化、并行化、鲁棒性、涌现能力——四大动机推动单体走向 Agent 社会;问题不在是否用多个,而在如何组织与协调。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.08s">
+          <div class="k-card-t"><span class="no">01</span>为何多个 Agent</div>
+          <div class="k-card-b">再强的通才也有<b>上下文极限</b>;一支专门化小团队以<span class="cy">并行</span>、互查与涌现胜过单体——正如专家团队胜过单个通才。</div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>六种协调机制</div>
+          <div class="k-card-b">共享黑板(置信度定冲突)·消息传递·规划分解 DAG(HTN)·投票共识·市场拍卖(合同网)·Stigmergy 环境间接通信。</div>
+        </div>
+        <div class="k-card fu" style="--d:.24s">
+          <div class="k-card-t"><span class="no">03</span>角色与人格</div>
+          <div class="k-card-b">Researcher、Coder、Critic、Orchestrator 各司其职;乐观者·怀疑者·务实派等人格化(六顶思考帽)减少群体思维。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 280" role="img" aria-label="四种多智能体拓扑:集中式星形、去中心化网状、层级树形、蜂群">
+          <line x1="215" y1="16" x2="215" y2="200" stroke="var(--line)" stroke-dasharray="3 5"/>
+          <line x1="430" y1="16" x2="430" y2="200" stroke="var(--line)" stroke-dasharray="3 5"/>
+          <line x1="645" y1="16" x2="645" y2="200" stroke="var(--line)" stroke-dasharray="3 5"/>
+          <!-- P1 集中式·星形 -->
+          <g class="draw" style="--d:.15s">
+            <line x1="98" y1="101" x2="48" y2="57" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="116" y1="101" x2="166" y2="57" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="98" y1="119" x2="48" y2="173" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="116" y1="119" x2="166" y2="173" stroke="var(--cyan)" stroke-width="1.5"/>
+          </g>
+          <g class="pop" style="--d:.3s">
+            <circle cx="42" cy="50" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+            <circle cx="172" cy="50" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+            <circle cx="42" cy="180" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+            <circle cx="172" cy="180" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          </g>
+          <circle cx="107" cy="110" r="11" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <text class="m" x="126" y="114">Manager</text>
+          <!-- P2 去中心化·网状 -->
+          <g class="draw" style="--d:.4s">
+            <line x1="320" y1="52" x2="263" y2="95" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="320" y1="52" x2="285" y2="162" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="320" y1="52" x2="355" y2="162" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="320" y1="52" x2="377" y2="95" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="263" y1="95" x2="285" y2="162" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="263" y1="95" x2="355" y2="162" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="263" y1="95" x2="377" y2="95" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="285" y1="162" x2="355" y2="162" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="285" y1="162" x2="377" y2="95" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+            <line x1="355" y1="162" x2="377" y2="95" stroke="rgba(78,201,212,.45)" stroke-width="1.2"/>
+          </g>
+          <circle cx="320" cy="52" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="263" cy="95" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="285" cy="162" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="355" cy="162" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="377" cy="95" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <!-- P3 层级式·树 -->
+          <g class="draw" style="--d:.55s">
+            <line x1="529" y1="49" x2="492" y2="111" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="541" y1="49" x2="578" y2="111" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="482" y1="124" x2="456" y2="186" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="492" y1="124" x2="518" y2="186" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="578" y1="124" x2="552" y2="186" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="588" y1="124" x2="614" y2="186" stroke="var(--cyan)" stroke-width="1.5"/>
+          </g>
+          <circle cx="535" cy="42" r="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <circle cx="487" cy="118" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="583" cy="118" r="7" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="452" cy="192" r="6.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="522" cy="192" r="6.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="548" cy="192" r="6.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="618" cy="192" r="6.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <!-- P4 蜂群 -->
+          <g class="draw" style="--d:.7s">
+            <line x1="690" y1="60" x2="745" y2="48" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="745" y1="48" x2="805" y2="72" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="690" y1="60" x2="672" y2="120" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="690" y1="60" x2="730" y2="110" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="745" y1="48" x2="730" y2="110" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="805" y1="72" x2="790" y2="130" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="672" y1="120" x2="700" y2="175" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="730" y1="110" x2="700" y2="175" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="790" y1="130" x2="820" y2="170" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="790" y1="130" x2="755" y2="185" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+            <line x1="700" y1="175" x2="755" y2="185" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+          </g>
+          <g class="pop" style="--d:.85s">
+            <circle cx="690" cy="60" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="745" cy="48" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="805" cy="72" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="672" cy="120" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="730" cy="110" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="790" cy="130" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="820" cy="170" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="700" cy="175" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+            <circle cx="755" cy="185" r="4.5" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.2"/>
+          </g>
+          <path d="M738,113 L778,125" stroke="var(--amber)" stroke-width="1.8"/>
+          <path d="M782,127 L773,130 L776,122 Z" fill="var(--amber)"/>
+          <text class="m" x="742" y="98" fill="var(--amber)">handoff</text>
+          <!-- 面板标题 -->
+          <text x="107" y="236" text-anchor="middle" style="font-weight:700">集中式 Supervisor</text>
+          <text class="mut" x="107" y="256" text-anchor="middle">hub-and-spoke · 单点故障</text>
+          <text x="320" y="236" text-anchor="middle" style="font-weight:700">去中心化 P2P</text>
+          <text class="mut" x="320" y="256" text-anchor="middle">网状 mesh · 涌现协调</text>
+          <text x="535" y="236" text-anchor="middle" style="font-weight:700">层级式 Hierarchical</text>
+          <text class="mut" x="535" y="256" text-anchor="middle">树形 · 委派链 · 域隔离</text>
+          <text x="750" y="236" text-anchor="middle" style="font-weight:700">蜂群 Swarm</text>
+          <text class="mut" x="750" y="256" text-anchor="middle">局部规则 · 无全局状态</text>
+        </svg>
+        <div class="figcap">图 25.1-25.4 · 四种多智能体拓扑:权威与通信如何流动,决定可扩展性、可调试性与容错性(p444-447)</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.3s"><b>怎么选</b>少于 5 个 Agent,集中式最简单;超过 20 个或需容错,转向层级式或蜂群;大多数生产系统最终采用层级式。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="138" y="16">动机</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="318" y="72">拓扑</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="548" y="12">协调</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="778" y="62">角色</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="1008" y="66">选型</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p443-462</span></footer>
+</section>

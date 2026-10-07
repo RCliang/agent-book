@@ -1,0 +1,132 @@
+<!-- ▸ c16a · 大规模并行策略(书 Ch11 上,p197-205) -->
+<section class="slide" id="c16a" data-part="2" data-crumb="PART II · CH 11" data-title="大规模并行策略">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 11</span><span class="dim">书 p197-205</span><span class="tag c">TP≤8</span><span class="tag c">ZeRO-3</span></div>
+    <h2 class="k-h">大规模并行策略<span class="en">DP · TP · SP · PP · FSDP · DILOCO</span></h2>
+    <p class="k-lede">RLHF 是系统工程题:四个模型同驻显存、训练循环摊到数百卡——沿四个本质不同的维度切分,再按通信层级组合起来。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>1470-1560</b><span>GB · 70B PPO 四模型显存合计</span></div>
+      <div class="k-num v"><b>19-20</b><span>块 A100-80GB · 朴素方案下限(ZeRO-3 为 8 节点)</span></div>
+      <div class="k-num c"><b>≤8</b><span>TP 度上限 · 每层 2 次 AllReduce 只付得起 NVLink</span></div>
+      <div class="k-num"><b>236×</b><span>解耦 DiLoCo 跨数据中心带宽降幅</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>四模型显存挑战</div>
+          <div class="k-card-b">policy、reference、reward、value head 同驻显存:合计 <b>1470-1560GB</b>;FSDP/ZeRO-3 后 <span class="am">8 节点</span>即可装下。</div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>TP 与 SP</div>
+          <div class="k-card-b">权重按列/行切,每层 <b>2 次 AllReduce</b>——仅限节点内;SP 复用同一通信零开销,省 LayerNorm/Dropout 激活 59GB/GPU。</div>
+        </div>
+        <div class="k-card fu" style="--d:.22s">
+          <div class="k-card-t"><span class="no">03</span>PP 气泡与 FSDP</div>
+          <div class="k-card-b">气泡≈(P−1)/(M+P−1),M≥10(P−1) 才 <b>&lt;10%</b>;PP 仅 100B+ 最后手段。FSDP 全分片每卡 140GB,通信为 DDP 的 3×。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 300" role="img" aria-label="四种并行策略:TP 切权重列、PP 切层、DP 复制数据、FSDP 全分片">
+          <!-- Q1 TP -->
+          <g class="pop" style="--d:.2s">
+            <rect x="14" y="18" width="406" height="128" rx="10" fill="rgba(78,201,212,.05)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="30" y="42" style="font-size:14px;font-weight:700">张量并行 TP</text>
+            <text class="m" x="404" y="42" text-anchor="end" fill="var(--cyan)">AllReduce ×2/层</text>
+            <rect x="30" y="54" width="144" height="54" rx="4" fill="var(--ink0)" stroke="var(--line)"/>
+            <rect x="30" y="54" width="48" height="54" fill="rgba(78,201,212,.10)"/>
+            <rect x="78" y="54" width="48" height="54" fill="rgba(78,201,212,.10)"/>
+            <rect x="126" y="54" width="48" height="54" fill="rgba(78,201,212,.10)"/>
+            <line x1="78" y1="54" x2="78" y2="108" stroke="var(--line)"/>
+            <line x1="126" y1="54" x2="126" y2="108" stroke="var(--line)"/>
+            <text class="m" x="54" y="85" text-anchor="middle">W₀</text>
+            <text class="m" x="102" y="85" text-anchor="middle">W₁</text>
+            <text class="m" x="150" y="85" text-anchor="middle">W₂</text>
+            <line x1="54" y1="108" x2="54" y2="122" stroke="var(--cyan)" stroke-width="1"/>
+            <line x1="102" y1="108" x2="102" y2="122" stroke="var(--cyan)" stroke-width="1"/>
+            <line x1="150" y1="108" x2="150" y2="122" stroke="var(--cyan)" stroke-width="1"/>
+            <rect x="32" y="122" width="44" height="18" rx="4" fill="var(--ink2)" stroke="var(--line)"/>
+            <rect x="80" y="122" width="44" height="18" rx="4" fill="var(--ink2)" stroke="var(--line)"/>
+            <rect x="128" y="122" width="44" height="18" rx="4" fill="var(--ink2)" stroke="var(--line)"/>
+            <text class="m" x="54" y="135" text-anchor="middle" style="font-size:9px">GPU0</text>
+            <text class="m" x="102" y="135" text-anchor="middle" style="font-size:9px">GPU1</text>
+            <text class="m" x="150" y="135" text-anchor="middle" style="font-size:9px">GPU2</text>
+            <text x="212" y="64" style="font-size:12px">权重按列(或行)切成 T 份</text>
+            <text class="mut" x="212" y="86">每卡独立算 XWᵢ,输出拼合</text>
+            <text class="mut" x="212" y="108">每层 2 次 AllReduce → 限节点内</text>
+            <text class="m" x="212" y="130" fill="var(--amber)">TP≤8 · 70B 训练必备 · 开销 12-18%</text>
+          </g>
+          <!-- Q2 PP -->
+          <g class="pop" style="--d:.35s">
+            <rect x="440" y="18" width="406" height="128" rx="10" fill="rgba(255,194,75,.045)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="456" y="42" style="font-size:14px;font-weight:700">流水线 PP</text>
+            <text class="m" x="832" y="42" text-anchor="end" fill="var(--amber)">气泡 (P−1)/(M+P−1)</text>
+            <rect x="456" y="54" width="98" height="50" rx="5" fill="var(--ink0)" stroke="var(--line)"/>
+            <text x="505" y="76" text-anchor="middle" style="font-size:11.5px">stage 0</text>
+            <text class="m" x="505" y="94" text-anchor="middle" style="font-size:9.5px">层 0-23</text>
+            <rect x="572" y="54" width="98" height="50" rx="5" fill="var(--ink0)" stroke="var(--line)"/>
+            <text x="621" y="76" text-anchor="middle" style="font-size:11.5px">stage 1</text>
+            <text class="m" x="621" y="94" text-anchor="middle" style="font-size:9.5px">层 24-47</text>
+            <rect x="688" y="54" width="98" height="50" rx="5" fill="var(--ink0)" stroke="var(--line)"/>
+            <text x="737" y="76" text-anchor="middle" style="font-size:11.5px">stage 2</text>
+            <text class="m" x="737" y="94" text-anchor="middle" style="font-size:9.5px">层 48-79</text>
+            <line x1="556" y1="79" x2="564" y2="79" stroke="var(--cyan)" stroke-width="1.5"/>
+            <polygon points="572,79 564,75 564,83" fill="var(--cyan)"/>
+            <line x1="672" y1="79" x2="680" y2="79" stroke="var(--cyan)" stroke-width="1.5"/>
+            <polygon points="688,79 680,75 680,83" fill="var(--cyan)"/>
+            <text class="mut" x="456" y="132" style="font-size:10.5px">点对点传激活 · M≥10(P−1) 时气泡 &lt;10% · 1F1B 生产标准</text>
+          </g>
+          <!-- Q3 DP -->
+          <g class="pop" style="--d:.5s">
+            <rect x="14" y="160" width="406" height="128" rx="10" fill="rgba(255,82,56,.04)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="30" y="184" style="font-size:14px;font-weight:700">数据并行 DP / DDP</text>
+            <text class="m" x="404" y="184" text-anchor="end" fill="var(--cyan)">梯度 AllReduce</text>
+            <rect x="30" y="196" width="100" height="34" rx="5" fill="var(--ink0)" stroke="var(--line)"/>
+            <text x="80" y="212" text-anchor="middle" style="font-size:11px">完整模型</text>
+            <text class="m" x="80" y="226" text-anchor="middle" style="font-size:9px">batch 0</text>
+            <rect x="150" y="196" width="100" height="34" rx="5" fill="var(--ink0)" stroke="var(--line)"/>
+            <text x="200" y="212" text-anchor="middle" style="font-size:11px">完整模型</text>
+            <text class="m" x="200" y="226" text-anchor="middle" style="font-size:9px">batch 1</text>
+            <rect x="270" y="196" width="100" height="34" rx="5" fill="var(--ink0)" stroke="var(--line)"/>
+            <text x="320" y="212" text-anchor="middle" style="font-size:11px">完整模型</text>
+            <text class="m" x="320" y="226" text-anchor="middle" style="font-size:9px">batch 2</text>
+            <path class="draw" style="--d:.85s" pathLength="1" d="M80,232 C130,254 270,254 320,232" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+            <text class="m" x="200" y="256" text-anchor="middle" style="font-size:9.5px">ring AllReduce · 与反向重叠</text>
+            <text class="mut" x="30" y="278" style="font-size:10.5px">每卡存完整模型+优化器 · ~64 卡内近线性 · &gt;7B 直接上 FSDP</text>
+          </g>
+          <!-- Q4 FSDP -->
+          <g class="pop" style="--d:.65s">
+            <rect x="440" y="160" width="406" height="128" rx="10" fill="rgba(78,201,212,.05)" stroke="var(--line)" stroke-width="1.2"/>
+            <text x="456" y="184" style="font-size:14px;font-weight:700">FSDP / ZeRO-3 全分片</text>
+            <text class="m" x="832" y="184" text-anchor="end" fill="var(--cyan)">AllGather + ReduceScatter</text>
+            <rect x="456" y="196" width="132" height="50" rx="4" fill="var(--ink0)" stroke="var(--line)"/>
+            <rect x="456" y="196" width="44" height="25" fill="rgba(255,194,75,.10)"/>
+            <rect x="544" y="196" width="44" height="25" fill="rgba(255,194,75,.10)"/>
+            <rect x="500" y="221" width="44" height="25" fill="rgba(255,194,75,.10)"/>
+            <line x1="500" y1="196" x2="500" y2="246" stroke="var(--line)"/>
+            <line x1="544" y1="196" x2="544" y2="246" stroke="var(--line)"/>
+            <line x1="456" y1="221" x2="588" y2="221" stroke="var(--line)"/>
+            <text class="m" x="478" y="212" text-anchor="middle" style="font-size:9px">1/N</text>
+            <text class="m" x="566" y="240" text-anchor="middle" style="font-size:9px">1/N</text>
+            <text x="612" y="212" style="font-size:12px">参数·梯度·优化器全切 1/N</text>
+            <text class="mut" x="612" y="234">算前 AllGather 重建,算完即弃</text>
+            <text class="mut" x="612" y="256">通信 3× DDP · 70B 每卡 140GB</text>
+            <text class="m" x="612" y="278" fill="var(--amber)">&gt;13B 默认 · 数百 GPU</text>
+          </g>
+        </svg>
+        <div class="figcap">图 11.2 · 四种并行怎么切:TP 切权重列/行、PP 切层成 stage、DP 复制模型分数据、FSDP 全分片按需重建——生产系统常组合 2-3 种</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.3s"><b>跨数据中心:解耦 DiLoCo</b>每 H 个本地步才同步一次外部更新(异步、可压缩):12B 模型经 2-5 Gbps 互联网跨 4 个区域训练,带宽省 236×、比异步 SGD 快 20×、质量持平。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">显存预算</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="304" y="72">TP·SP</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="528" y="12">PP 气泡</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="758" y="62">FSDP</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="978" y="66">DiLoCo</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II · 基础设施</span><span class="pg">p197-205</span></footer>
+</section>

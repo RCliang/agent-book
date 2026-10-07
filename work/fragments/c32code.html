@@ -1,0 +1,49 @@
+<!-- ▸ c32code · 代码实战:Agentic UI 全栈 Backend(FastAPI + LangGraph) -->
+<section class="slide codeslide" id="c32code" data-part="5" data-crumb="PART V · 代码 27" data-title="Agentic UI 全栈">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 27.4 · 书 p508-510</span><span class="tag c">Python</span><span class="tag c">FastAPI · SSE</span></div>
+    <h2 class="k-h">全栈 Agent 化 UI:Backend<span class="en">SSE STREAMING · APPROVAL GATE</span></h2>
+    <p class="k-lede">书 27.9:FastAPI 生成器产出 SSE 事件流;不可逆操作先推审批事件,再在 asyncio.Event 处挂起——流不断、Agent 停,人点头后才继续。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">async def</span> <span class="f">agent_stream</span>(session_id: <span class="k">str</span>, user_message: <span class="k">str</span>):
+    <span class="k">def</span> <span class="f">sse</span>(event_type: <span class="k">str</span>, data: <span class="k">dict</span>) -&gt; <span class="k">str</span>:
+        <span class="k">return</span> <span class="s">f"data: {json.dumps({'type': event_type, **data})}\n\n"</span>
+    approval_id = <span class="s">f"{session_id}_email_001"</span>        <span class="c">② Tier 3 审批门控</span>
+    approval_store[approval_id] = ev = asyncio.<span class="f">Event</span>()
+    <span class="k">yield</span> <span class="f">sse</span>(<span class="s">"approval_required"</span>, {<span class="s">"approval_id"</span>: approval_id,
+            <span class="s">"tool"</span>: <span class="s">"send_email"</span>, <span class="s">"tier"</span>: 3, <span class="s">"risk"</span>: <span class="s">"irreversible"</span>})
+    <span class="k">try</span>:
+        <span class="k">await</span> asyncio.<span class="f">wait_for</span>(ev.<span class="f">wait</span>(), timeout=300)  <span class="c">③ 挂起整条流</span>
+        <span class="k">...</span>  <span class="c">批准 → 执行 send_email;拒绝 → action_rejected</span>
+    <span class="k">except</span> asyncio.<span class="f">TimeoutError</span>:
+        <span class="k">yield</span> <span class="f">sse</span>(<span class="s">"approval_timeout"</span>, {<span class="s">"approval_id"</span>: approval_id})
+    <span class="k">yield</span> <span class="f">sse</span>(<span class="s">"token"</span>, {<span class="s">"content"</span>: <span class="s">"I've completed the research. "</span>})
+<span class="k">@app.get</span>(<span class="s">"/chat/stream"</span>)                     <span class="c">① SSE 主通道</span>
+<span class="k">async def</span> <span class="f">chat_stream</span>(session_id: <span class="k">str</span>, message: <span class="k">str</span>):
+    <span class="k">return</span> <span class="f">StreamingResponse</span>(<span class="f">agent_stream</span>(session_id, message),
+                             media_type=<span class="s">"text/event-stream"</span>)
+<span class="k">@app.post</span>(<span class="s">"/chat/approve"</span>)                    <span class="c">④ 批准端点 → 恢复</span>
+<span class="k">async def</span> <span class="f">handle_approval</span>(req: <span class="f">ApprovalRequest</span>):
+    approval_results[req.approval_id] = {<span class="s">"approved"</span>: req.approved,
+                                         <span class="s">"parameters"</span>: req.parameters}
+    approval_store[req.approval_id].<span class="f">set</span>()   <span class="c">set() 唤醒挂起的流</span></pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①</span>SSE 是 Agent UI 主通道</div><div class="k-card-b">一条 SSE 连接混排 status/thinking/tool_call/tool_result 事件,前端按类型分别渲染。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">②</span>门控即打断</div><div class="k-card-b">send_email 命中 Tier 3 清单:emit approval_required 后 await 事件挂起等待。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">③</span>限时兜底,拒绝也有终态</div><div class="k-card-b">等 300 秒不批则 approval_timeout、动作跳过——门控不会变成死锁。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">④</span>POST 批准,原地恢复</div><div class="k-card-b">前端 ApprovalGate 渲染按钮,POST /chat/approve 唤醒,原地恢复执行;乐观更新先显结果。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>依赖 fastapi;uvicorn main:app 启动,浏览器开 /chat 发消息,敏感动作即触发审批。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="128" y="16">SSE 事件流</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="368" y="70">审批门控</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="606" y="14">挂起 300s</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="844" y="64">approve 恢复</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p508-512</span></footer>
+</section>

@@ -1,0 +1,72 @@
+<!-- ▸ c18a · 测试时计算扩展(Ch13 · p249-257) -->
+<section class="slide" id="c18a" data-part="3" data-crumb="PART III · CH 13" data-title="测试时计算扩展">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART III · CH 13</span><span class="dim">书 p249-257</span><span class="tag c">ToT</span><span class="tag c">MCTS</span></div>
+    <h2 class="k-h">测试时计算扩展<span class="en">TEST-TIME SCALING · CoT → ToT → MCTS</span></h2>
+    <p class="k-lede">推理即搜索:多步推理是在部分解构成的树上导航。测试时扩展(Test-Time Scaling)用推理算力换准确率——小模型多「想」几步,即可匹敌更大的模型。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38 fu" style="--d:.05s">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>为何推理要不同的 RL</div>
+          <div class="k-card-b">RLHF 对整段回答给单一标量:稀疏奖励、长时序、组合搜索三重困难;而数学/代码正确性可客观验证——<span class="cy">奖励可自动计算</span>。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>CoT:涌现 vs 训练</div>
+          <div class="k-card-b">涌现 CoT(≥100B)脆弱、依赖 Prompt;RL 训练的更长、更具探索,自发「Wait, let me reconsider…」纠错——<b class="hl">模型自身即搜索算法</b>。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 200" role="img" aria-label="测试时算力扩展曲线与预算选型区间">
+          <!-- 预算选型区间底纹(据表 13.2) -->
+          <rect x="60" y="12" width="240" height="146" fill="var(--cyan-bg)"/>
+          <rect x="300" y="12" width="250" height="146" fill="rgba(255,194,75,.06)"/>
+          <rect x="550" y="12" width="268" height="146" fill="var(--verm-bg)"/>
+          <text x="76" y="30" style="font-weight:700">预算 &lt;5×</text>
+          <text class="mut" x="76" y="47">CoT · 自洽性</text>
+          <text x="316" y="30" style="font-weight:700">5–50×</text>
+          <text class="mut" x="316" y="47">BoN+PRM · ToT</text>
+          <text x="566" y="30" style="font-weight:700">50–500×</text>
+          <text class="mut" x="655" y="30">MCTS · R1/o1</text>
+          <!-- 坐标轴 -->
+          <line x1="60" y1="12" x2="60" y2="158" stroke="var(--line)" stroke-width="1.5"/>
+          <line x1="60" y1="158" x2="818" y2="158" stroke="var(--line)" stroke-width="1.5"/>
+          <text class="m" x="18" y="20" transform="rotate(-90 18 20)" style="letter-spacing:.2em">准确率</text>
+          <text class="m" x="570" y="184" style="letter-spacing:.12em">测试时算力(推理 Token,log)→</text>
+          <!-- 两条模型规模曲线 -->
+          <path class="draw" style="--d:.3s" pathLength="1" d="M78,116 C260,98 460,62 800,38" fill="none" stroke="var(--verm)" stroke-width="2"/>
+          <path class="draw" style="--d:.5s" pathLength="1" d="M78,146 C280,134 520,96 800,60" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+          <!-- 等准确率对照 -->
+          <line x1="540" y1="60" x2="800" y2="60" stroke="rgba(78,201,212,.4)" stroke-width="1" stroke-dasharray="4 4"/>
+          <circle class="pop" style="--d:.85s" cx="540" cy="60" r="5" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <circle class="pop" style="--d:1s" cx="800" cy="60" r="5" fill="var(--cyan)"/>
+          <text class="mut" x="120" y="78">大模型(少思考)</text>
+          <text class="mut" x="556" y="118">小模型 × 更多思考 → 同一准确率</text>
+          <text class="m" x="420" y="146" fill="var(--amber)">acc ≈ f(α·log Ctrain + β·log Ctest) · 式(13.1)</text>
+        </svg>
+        <div class="figcap">图 13.1 · 准确率随推理 Token 对数线性提升,小模型以更多思考追平大模型;预算选型区间据表 13.2(p257)</div>
+      </div>
+    </div>
+    <table class="k-table fu" style="--d:.3s">
+      <thead><tr><th>方法</th><th>结构</th><th>LLM 调用</th><th>奖励信号</th><th>最适用</th></tr></thead>
+      <tbody>
+        <tr><td>思维链 CoT</td><td>线性链</td><td>1</td><td>无</td><td>简单—中等难度</td></tr>
+        <tr><td>自洽性 SC</td><td>并行链 · 全并行</td><td>N · T=0.7–1.0</td><td>多数投票 = 隐式 ORM</td><td>答案离散的数学题(GSM8K <b class="hl">74.4%</b>)</td></tr>
+        <tr><td>Best-of-N + RM</td><td>并行链</td><td>N+1 / N+N·K</td><td>ORM / PRM</td><td>有良好 RM;p=0.3,N=10 → 97%</td></tr>
+        <tr><td>思维树 ToT / 思维图 GoT</td><td>树 BFS·DFS / DAG</td><td>2kbd</td><td>LLM 作判官</td><td>24 点 <b class="hl">74%</b> vs CoT 4%;合并省 62%</td></tr>
+        <tr><td>蒙特卡洛树搜索 MCTS</td><td>树 + 价值网络</td><td>O(Nsim·d)</td><td>价值网络 + Rollout</td><td>困难证明、编程 · PUCT</td></tr>
+        <tr><td>步级束搜索 / Self-Refine</td><td>前缀束 / 线性迭代</td><td>O(kd) / 2T</td><td>价值模型 / 自我评判</td><td>正确性+流畅性 / 开放式生成</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">推理即搜索</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">自洽性</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="524" y="12">ToT·GoT</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="756" y="62">MCTS</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="984" y="66">束搜索·精炼</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part III 推理</span><span class="pg">p249-257</span></footer>
+</section>

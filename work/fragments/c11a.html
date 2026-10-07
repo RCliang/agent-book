@@ -1,0 +1,89 @@
+<!-- ▸ c11a · DPO:直接偏好优化 -->
+<section class="slide" id="c11a" data-part="2" data-crumb="PART II · CH 06" data-title="DPO:直接偏好优化">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 06</span><span class="dim">书 p145-149</span><span class="tag c">免 RM</span><span class="tag c">β=0.1</span></div>
+    <h2 class="k-h">直接偏好优化<span class="en">DPO · SKIP RL, LEARN FROM PREFERENCES</span></h2>
+    <p class="k-lede">DPO 从 RLHF 目标的解析解出发,把「reward 最大化 + KL 惩罚」变成偏好对上的监督 loss:4 个模型变 2 个,跳过 RL 与在线采样,回到稳定监督学习。</p>
+  </header>
+  <div class="s-body">
+    <ul class="k-flow fu" style="--d:.05s">
+      <li>RLHF 目标:max E[r] − β·D_KL</li>
+      <li>最优解 π* ∝ π_ref·exp(r/β)</li>
+      <li>重排解出 reward r</li>
+      <li>代入 Bradley-Terry,Z(x) 抵消</li>
+      <li>得 L_DPO(6.1)</li>
+    </ul>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>动机:跳过 RL</div>
+          <div class="k-card-b">PPO 需在显存维持 <b>4 个模型</b>(policy、reference、reward、value)+ RL 基础设施,且不稳定。DPO:最优 policy 有<span class="cy">解析解</span>,直接改写成监督 loss。</div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>Loss 与隐式奖励</div>
+          <div class="k-card-b">隐式奖励 <b>r̂ = β·log(πθ/π_ref)</b>。loss 是偏好对上的交叉熵:「标签」= 被选奖励须高于被拒;训练后 margin 稳定在约 <span class="am">1/(2β)</span>。</div>
+        </div>
+        <div class="k-card fu" style="--d:.22s">
+          <div class="k-card-t"><span class="no">03</span>β 的作用</div>
+          <div class="k-card-b">β 小 → 约束弱,<b>更新更激进</b>,但梯度 ∝β 变小、收敛慢;β 大 → sigmoid 饱和、梯度归零。从 <span class="am">0.1</span> 起步,在 [0.05, 0.5] 内调。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 300" role="img" aria-label="PPO 四模型管线与 DPO 双模型管线对比">
+          <!-- 左:PPO -->
+          <rect x="16" y="24" width="380" height="252" rx="10" fill="rgba(255,82,56,.045)" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="32" y="50" style="font-size:15px;font-weight:700">PPO · 四模型并存</text>
+          <text class="m" x="380" y="50" text-anchor="end" fill="var(--verm)">RL · 不稳定</text>
+          <rect x="30" y="64" width="168" height="42" rx="7" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="114" y="90" text-anchor="middle">Policy πθ · actor</text>
+          <rect x="214" y="64" width="168" height="42" rx="7" fill="var(--ink0)" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="298" y="90" text-anchor="middle">Reference π_ref · KL</text>
+          <rect x="30" y="122" width="168" height="42" rx="7" fill="var(--ink0)" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="114" y="148" text-anchor="middle">Reward 模型 r(x,y)</text>
+          <rect x="214" y="122" width="168" height="42" rx="7" fill="var(--ink0)" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="298" y="148" text-anchor="middle">Value head V(s)</text>
+          <line x1="114" y1="106" x2="114" y2="116" stroke="var(--cyan)" stroke-width="1.5"/>
+          <path d="M114,122 l-4.5,-7 l9,0 z" fill="var(--cyan)"/>
+          <text class="mut" x="126" y="118" style="font-size:11px">rollout</text>
+          <text class="mut" x="30" y="198">policy 生成 rollout → reward 打分 → value 估优势</text>
+          <text class="mut" x="30" y="220">reference 提供 KL 约束,防止 policy 漂移</text>
+          <text class="mut" x="30" y="250">显存:4 份模型副本 + RL 基础设施 · <tspan fill="var(--verm)">以不稳定著称</tspan></text>
+          <!-- 中:跳过 RL -->
+          <path class="draw" style="--d:.35s" pathLength="1" d="M402,150 L456,150" fill="none" stroke="var(--verm)" stroke-width="2"/>
+          <path d="M464,150 l-9,-5 l0,10 z" fill="var(--verm)"/>
+          <text x="430" y="134" text-anchor="middle" fill="var(--verm)" style="font-size:12px;font-weight:700">跳过 RL</text>
+          <text class="m" x="430" y="172" text-anchor="middle" fill="var(--amber)" style="font-size:11px">4 → 2</text>
+          <!-- 右:DPO -->
+          <rect x="464" y="24" width="380" height="252" rx="10" fill="rgba(78,201,212,.05)" stroke="var(--line)" stroke-width="1.5"/>
+          <text x="480" y="50" style="font-size:15px;font-weight:700">DPO · 双模型</text>
+          <text class="m" x="828" y="50" text-anchor="end" fill="var(--cyan)">监督式 · 稳定</text>
+          <rect class="pop" style="--d:.5s" x="478" y="64" width="168" height="42" rx="7" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="562" y="90" text-anchor="middle">Policy πθ · actor</text>
+          <rect class="pop" style="--d:.65s" x="662" y="64" width="168" height="42" rx="7" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="746" y="90" text-anchor="middle">Reference π_ref · 冻结</text>
+          <line x1="562" y1="106" x2="562" y2="154" stroke="var(--cyan)" stroke-width="1.5"/>
+          <path d="M562,162 l-4.5,-8 l9,0 z" fill="var(--cyan)"/>
+          <line x1="746" y1="106" x2="746" y2="154" stroke="var(--cyan)" stroke-width="1.5"/>
+          <path d="M746,162 l-4.5,-8 l9,0 z" fill="var(--cyan)"/>
+          <text class="m" x="570" y="134" style="font-size:11px">log πθ(y|x)</text>
+          <text class="m" x="738" y="134" text-anchor="end" style="font-size:11px">log π_ref(y|x)</text>
+          <rect class="pop" style="--d:.85s" x="492" y="166" width="276" height="42" rx="7" fill="var(--cyan-bg)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <text class="m" x="630" y="192" text-anchor="middle">L_DPO = − log σ( β·h )</text>
+          <text class="mut" x="480" y="232">h = 对数比之差(被选 − 被拒)</text>
+          <text class="mut" x="480" y="252">隐式奖励 r̂ = β·log(πθ/π_ref) · <tspan fill="var(--cyan)">无 rollout</tspan></text>
+        </svg>
+        <div class="figcap">图 6.1 · PPO 四模型管线 vs DPO 双模型管线:去掉 reward 模型与 value head,冻结的 reference 只提供对数概率基线,训练退化为一次监督学习</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.3s"><b>标签掩码</b>梯度只落在补全 token 上:prompt 与 padding 无梯度;被选 token 全被推高、被拒 token 全被压低;序列级对数概率逐 token 求和而非求均值(6.3)。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="120" y="16">PPO 痛点</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="295" y="72">解析最优解</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="528" y="12">BT 代入</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="755" y="62">隐式奖励</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="985" y="66">标签掩码</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II</span><span class="pg">p145-149</span></footer>
+</section>

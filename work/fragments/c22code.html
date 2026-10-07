@@ -1,0 +1,49 @@
+<!-- ▸ c22code · 代码实战:基于 Embedding 的向量存储记忆 + 记忆增强循环 -->
+<section class="slide codeslide" id="c22code" data-part="5" data-crumb="PART V · 代码 17" data-title="向量记忆实现">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 17.1 + 17.10.3 · 书 p326-334</span><span class="tag c">Python</span><span class="tag c">numpy</span></div>
+    <h2 class="k-h">向量存储记忆:写入、检索、注入<span class="en">EMBED · DECAY · INJECT</span></h2>
+    <p class="k-lede">书 17.10:记忆存成带元数据的 Embedding,读时以「余弦相似 × 时间衰减」打分取 top-k,再注入 system prompt——写什么、怎么读、怎么进上下文的最小闭环。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">class</span> VectorMemoryStore:
+    <span class="k">def</span> <span class="f">write</span>(<span class="k">self</span>, content, importance=<span class="k">0.5</span>, check_duplicates=<span class="k">True</span>):
+        <span class="k">if</span> check_duplicates <span class="k">and</span> <span class="f">self._is_duplicate</span>(content):  <span class="c">① 写入过滤</span>
+            <span class="k">return</span> <span class="k">None</span>   <span class="c"># 余弦相似度&gt;0.95:近似重复,直接跳过</span>
+        <span class="k">if</span> <span class="f">len</span>(<span class="f">self.entries</span>) &gt;= <span class="f">self.max_entries</span>:
+            <span class="f">self._evict</span>()  <span class="c"># 满:逐出「最不重要×最久未访」条目</span>
+        <span class="f">self.entries</span>.<span class="f">append</span>(MemoryEntry(content=content,
+            embedding=<span class="f">self.embed_fn</span>(content), importance=importance))
+
+    <span class="k">def</span> <span class="f">retrieve</span>(<span class="k">self</span>, query, k=<span class="k">5</span>, recency_boost=<span class="k">True</span>):
+        dense_scores = <span class="f">self._cosine_similarities</span>(<span class="f">self.embed_fn</span>(query))
+        <span class="k">for</span> entry, d_score <span class="k">in</span> <span class="f">zip</span>(<span class="f">self.entries</span>, dense_scores):  <span class="c">② 相似×时近</span>
+            age_h = (datetime.<span class="f">now</span>() - entry.timestamp).<span class="f">total_seconds</span>()/<span class="k">3600</span>
+            recency = np.<span class="f">exp</span>(-<span class="f">self.decay_rate</span> * age_h)  <span class="c"># 每小时衰减</span>
+            score = (<span class="k">1</span> - <span class="f">self.recency_weight</span>) * d_score \
+                    + <span class="f">self.recency_weight</span> * recency
+        ...  <span class="c"># 组合分降序取 top-k;更新 access_count/last_accessed</span>
+<span class="k">class</span> MemoryAugmentedAgent:
+    <span class="k">def</span> <span class="f">step</span>(<span class="k">self</span>, user_message: <span class="k">str</span>) -&gt; <span class="k">str</span>:  <span class="c">③ 记忆进 prompt</span>
+        memories = <span class="f">self.memory.retrieve</span>(user_message, k=<span class="k">5</span>)
+        system = <span class="f">self.SYSTEM_PROMPT</span> + <span class="s">f"\n\n{self._format_memories(memories)}"</span>
+        ...  <span class="c"># + get_hot_context() 热层;最近 6 轮 → llm → 执行记忆命令</span></pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①</span>写什么:写入有门槛</div><div class="k-card-b">写入有门槛:与现有记忆余弦相似 &gt;0.95 判近似重复丢弃;容量满按「重要性×时近」驱逐。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">②</span>怎么读:混合打分</div><div class="k-card-b">混合打分 score=(1−0.3)·余弦 + 0.3·e^(−λ·age):相似为主、时间衰减兜底,取 top-k。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">③</span>记忆如何进 prompt</div><div class="k-card-b">检索结果格式化进 system prompt,标注来源与重要度——记忆由此进入上下文。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">+</span>自驱记忆(MemGPT 式)</div><div class="k-card-b">MemGPT 式自驱:LLM 在响应中发 [MEMORY_WRITE] 命令,即自动写入记忆库。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>依赖 openai 嵌入 + 任一向量库;预期:同题二问零重检索命中,答案附带记忆标记。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="134" y="16">写入过滤</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="364" y="70">相似×衰减</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="616" y="14">top-k</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="848" y="66">热层注入</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p326-334</span></footer>
+</section>

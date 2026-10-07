@@ -1,0 +1,92 @@
+<!-- ▸ c10 · PPO:近端策略优化 -->
+<section class="slide" id="c10" data-part="2" data-crumb="PART II · CH 05" data-title="PPO:近端策略优化">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 05</span><span class="dim">书 p137-144</span><span class="tag c">PPO</span><span class="tag c">ε = 0.2</span></div>
+    <h2 class="k-h">PPO:近端策略优化<span class="en">PROXIMAL POLICY OPTIMIZATION</span></h2>
+    <p class="k-lede">朴素策略梯度一次坏 batch 就可能崩溃。PPO 用一阶 <b>clipped 目标</b>复现 TRPO 的稳定性,实现简单 <b>10×</b>——GPT-4 与 Claude 背后的主力算法。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.05s">
+          <div class="k-card-t"><span class="no">01</span>动机与六步推导</div>
+          <div class="k-card-b">TRPO 需昂贵二阶优化;PPO 一阶 clip 简单 10×,同样稳定。链:RL 目标→<span class="cy">策略梯度</span>→重要性采样→失控→clip。</div>
+        </div>
+        <div class="k-code fu" style="--d:.14s"><pre>L = L_CLIP − c1·LVF + c2·H[π]
+L_CLIP = E[ min(r·Â, clip(r, 1−ε, 1+ε)·Â) ]
+ε = 0.2 · c1 = 0.1 · c2 = 0.01
+— value loss 亦被 clip · 熵奖励保探索</pre></div>
+        <div class="k-card fu" style="--d:.22s">
+          <div class="k-card-t"><span class="no">02</span>Rollout Buffer 生命周期</div>
+          <div class="k-card-b">收集→训练(<span class="cy">3–10 epoch</span>)→清空;旧数据过期。KL 惩罚 R=r_RM−0.05·mean_KL 只在末 token。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 280" role="img" aria-label="PPO-RLHF 训练循环:rollout 阶段与优化阶段,四个模型各就其位">
+          <defs><marker id="arw10" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/></marker></defs>
+          <!-- 阶段分区 -->
+          <rect x="24" y="26" width="244" height="196" rx="8" fill="var(--cyan-bg)"/>
+          <rect x="552" y="26" width="284" height="196" rx="8" fill="var(--verm-bg)"/>
+          <text class="m" x="40" y="48">① ROLLOUT · 60–70% 时间</text>
+          <text class="m" x="568" y="48">② 优化 · 3–10 epoch</text>
+          <!-- Actor -->
+          <rect class="pop" style="--d:.4s" x="44" y="64" width="200" height="64" rx="6" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <text x="64" y="90" style="font-weight:700">Actor πθ</text>
+          <text class="mut" x="64" y="110">实时网络 · 逐 token 生成</text>
+          <!-- Reference -->
+          <rect x="44" y="158" width="200" height="56" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)"/>
+          <text x="64" y="181" style="font-weight:700">Reference πref</text>
+          <text class="mut" x="64" y="200">冻结 · 提供 KL 锚</text>
+          <!-- Buffer -->
+          <rect x="322" y="104" width="176" height="70" rx="6" fill="var(--ink2)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <text x="340" y="132" style="font-weight:700">Rollout Buffer</text>
+          <text class="m" x="340" y="152">(s, a, log π_old, r, V)</text>
+          <!-- Reward -->
+          <rect x="572" y="60" width="118" height="56" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)"/>
+          <text x="590" y="83" style="font-weight:700">Reward R_φ</text>
+          <text class="mut" x="590" y="102">对 (x,y) 打分</text>
+          <!-- Critic -->
+          <rect x="572" y="158" width="118" height="56" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)"/>
+          <text x="590" y="181" style="font-weight:700">Critic V_ψ</text>
+          <text class="mut" x="590" y="200">GAE → Â</text>
+          <!-- 更新 -->
+          <rect class="pop" style="--d:.6s" x="712" y="92" width="112" height="94" rx="6" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <text x="728" y="118" style="font-weight:700">PPO 更新</text>
+          <text class="mut" x="728" y="140">clip ε = 0.2</text>
+          <text class="mut" x="728" y="158">mini-batch 16</text>
+          <!-- 数据流箭头 -->
+          <path d="M244,96 C 284,96 296,124 322,130" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw10)"/>
+          <path d="M498,122 C 528,112 540,94 572,90" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw10)"/>
+          <path d="M498,156 C 528,166 540,184 572,186" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw10)"/>
+          <path d="M690,88 C 702,88 708,100 712,112" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw10)"/>
+          <path d="M690,186 C 702,186 708,172 712,166" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw10)"/>
+          <!-- KL 惩罚(虚线) -->
+          <path d="M244,190 C 330,240 540,224 600,118" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-dasharray="5 5" marker-end="url(#arw10)"/>
+          <text class="mut" x="296" y="242">KL 惩罚</text>
+          <!-- 循环回路 -->
+          <path class="draw" style="--d:.8s" pathLength="1" d="M768,186 C 768,258 410,258 410,174" fill="none" stroke="var(--verm)" stroke-width="1.8" marker-end="url(#arw10)"/>
+          <text class="m" x="470" y="264" fill="var(--amber)">θ→θold · buffer 清空 · 新 rollout</text>
+        </svg>
+        <div class="figcap">图 5.1 · PPO-RLHF 循环,四模型各就其位:Actor 生成、Reference 锚 KL、Reward 打分、Critic 估优势;每周期 buffer 清空,θ→θold 归位</div>
+      </div>
+    </div>
+    <table class="k-table fu" style="--d:.3s">
+      <thead><tr><th>关键超参</th><th>典型值</th><th>设错的影响</th></tr></thead>
+      <tbody>
+        <tr><td class="m">cliprange</td><td class="m">0.2</td><td>过低学不到东西 · 过高不稳定</td></tr>
+        <tr><td class="m">init_kl_coef</td><td class="m">0.01–0.1</td><td>过低 reward hacking · 过高卡在 SFT</td></tr>
+        <tr><td class="m">ppo_epochs</td><td class="m">4</td><td>过多过拟合 · 过少浪费生成算力</td></tr>
+        <tr><td class="m">learning_rate</td><td class="m">1–5×10⁻⁶</td><td>过高:灾难性遗忘</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C180,10 340,74 520,44 S900,10 1140,44"/>
+    <g class="rn" style="--d:.3s" transform="translate(140,32)"><circle r="4.5"/><text y="-10">TRPO</text></g>
+    <g class="rn" style="--d:.55s" transform="translate(330,54)"><circle r="4.5"/><text y="20">clip ε=0.2</text></g>
+    <g class="rn" style="--d:.8s" transform="translate(520,44)"><circle r="4.5"/><text y="-10">重要性采样</text></g>
+    <g class="rn" style="--d:1.05s" transform="translate(760,26)"><circle r="4.5"/><text y="-10">Buffer</text></g>
+    <g class="rn" style="--d:1.3s" transform="translate(1000,44)"><circle r="4.5"/><text y="20">四模型循环</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II · PPO</span><span class="pg">p137-144</span></footer>
+</section>

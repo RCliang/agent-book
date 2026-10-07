@@ -1,0 +1,93 @@
+<!-- ▸ c18b · R1·o1·RLVR(Ch13 · p257-269) -->
+<section class="slide" id="c18b" data-part="3" data-crumb="PART III · CH 13" data-title="R1·o1·RLVR">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART III · CH 13</span><span class="dim">书 p257-269</span><span class="tag c">R1</span><span class="tag c">RLVR</span></div>
+    <h2 class="k-h">R1 · o1 · 可验证奖励<span class="en">DEEPSEEK-R1 · O1/O3 · RLVR</span></h2>
+    <p class="k-lede">DeepSeek-R1 两阶段全透明:冷启动 SFT + GRPO;可验证奖励(RLVR)下仅结果奖励即足以涌现推理——aha 时刻自然发生。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38 fu" style="--d:.05s">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>R1-Zero:纯 RL 的顿悟</div>
+          <div class="k-card-b">基座直接纯 RL 不稳(混语、重复循环),却涌现「Wait, let me reconsider…」自我纠正——<b class="hl">aha 时刻</b>纯由准确率目标涌现。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>奖励:可验证即足够</div>
+          <div class="k-card-b">r = racc + <span class="am">0.1</span>·rfmt:SymPy/测试用例验答案,查 think/answer 标签;不用 PRM——PRM 反引入步级奖励黑客。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 180" role="img" aria-label="DeepSeek-R1 训练流程与蒸馏分支">
+          <!-- 主链:基座 → 冷启动 SFT → GRPO RL → 拒绝采样+SFT → R1 -->
+          <rect x="10" y="14" width="146" height="52" rx="7" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="24" y="36" style="font-weight:700">DeepSeek-V3 基座</text>
+          <text class="mut" x="24" y="55">671B MoE · 37B 激活</text>
+          <line x1="158" y1="40" x2="180" y2="40" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="180,36 188,40 180,44" fill="var(--cyan)"/>
+          <rect x="190" y="14" width="136" height="52" rx="7" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="204" y="36" style="font-weight:700">冷启动 SFT</text>
+          <text class="mut" x="204" y="55">数千条长 CoT</text>
+          <line x1="328" y1="40" x2="350" y2="40" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="350,36 358,40 350,44" fill="var(--cyan)"/>
+          <rect x="360" y="14" width="136" height="52" rx="7" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="374" y="36" style="font-weight:700">GRPO RL</text>
+          <text class="mut" x="374" y="55">数学·代码 验证奖励</text>
+          <line x1="498" y1="40" x2="520" y2="40" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="520,36 528,40 520,44" fill="var(--cyan)"/>
+          <rect x="530" y="14" width="136" height="52" rx="7" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="544" y="36" style="font-weight:700">拒绝采样 + SFT</text>
+          <text class="mut" x="544" y="55">只保留正确解答</text>
+          <line x1="668" y1="40" x2="690" y2="40" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="690,36 698,40 690,44" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:.4s" x="700" y="14" width="150" height="52" rx="7" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <text x="714" y="37" style="font-weight:700;font-size:15px" fill="var(--amber)">R1</text>
+          <text class="mut" x="714" y="56">最终 RL · 对齐</text>
+          <text class="mut" x="20" y="86">不加冷启动直接 RL → 混语、重复循环;涌现自我纠正(R1-Zero)</text>
+          <!-- 蒸馏分支 -->
+          <path class="draw" style="--d:.6s" pathLength="1" d="M598,66 L598,102" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="mut" x="608" y="94">蒸馏数据</text>
+          <rect class="pop" style="--d:.8s" x="10" y="106" width="840" height="54" rx="7" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)" stroke-dasharray="5 4"/>
+          <text x="26" y="128" style="font-weight:700">R1 生成链 → 过滤正确解答 → SFT 小模型(Qwen2.5 · Llama-3)</text>
+          <text class="mut" x="26" y="150">R1-Distill:1.5B / 7B / 8B / 14B / 32B / 70B —— 蒸馏胜过小模型从零 RL:缺的是探索,不是表示</text>
+        </svg>
+        <div class="figcap">图:R1 训练流程(书 p259)· 上行主链自 DeepSeek-V3 至 R1;下行蒸馏分支产出 R1-Distill 系列</div>
+      </div>
+    </div>
+    <div class="grid3 fu" style="--d:.25s">
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">03</span>GRPO:组相对策略优化</div>
+        <div class="k-card-b">每题采 G=<span class="am">8</span> 答,优势 Âi=(ri−μr)/σr 组内归一化;clip+KL 罚;全对/全错组零梯度——自然聚焦能力前沿。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">04</span>R1-Distill 蒸馏</div>
+        <div class="k-card-b">R1 生成→过滤→SFT 小模型(1.5B–70B);7B 蒸馏胜过 7B 从零 RL——小模型缺探索,不缺表示。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">05</span>OpenAI o1 / o3</div>
+        <div class="k-card-b">隐藏推理 token 不展示:无格式约束、无风格作弊;据信 PRM+ORM;AIME'24 <b class="hl">83%</b>(GPT-4o 13%)、o4-mini 93%。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">06</span>QwQ / Qwen 多阶段 RL</div>
+        <div class="k-card-b">基座→SFT→拒绝采样 RFT→GRPO 两阶段 RL;比纯 RL 稳、比纯 SFT 强;推理链内调 Python 工具验证。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">07</span>Journey · Quiet-STaR</div>
+        <div class="k-card-b">Journey Learning 连失败与纠正一起训练(负样本+纠错);Quiet-STaR 每 token 位置思考,代价 ×(Lz+1)。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">08</span>过度思考与算力权衡</div>
+        <div class="k-card-b">链过长误差累积,准确率 U 形;思考占比按难度 30%/80%/95%;训练与测试算力可互换,最优占比 α/(α+β)。</div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">R1-Zero</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">aha 时刻</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="530" y="12">GRPO</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="748" y="62">R1-Distill</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="984" y="66">o1·RLVR</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part III 推理</span><span class="pg">p257-269</span></footer>
+</section>

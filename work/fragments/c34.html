@@ -1,0 +1,68 @@
+<!-- ▸ c34 · 速查手册精华 -->
+<section class="slide" id="c34" data-part="6" data-crumb="PART VI · 速查" data-title="速查手册精华">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART VI · CH 29</span><span class="dim">书 p561-567</span><span class="tag c">公式</span><span class="tag am">超参</span></div>
+    <h2 class="k-h">速查手册精华<span class="en">CHEAT SHEET · FORMULAS · HYPERPARAMS · FAILURES</span></h2>
+    <p class="k-lede">临考速查:三条核心公式、六组关键超参、一张方法选择决策卡与五种常见失效模式——调试 PPO/DPO/GRPO 流水线时,先翻这一页。</p>
+  </header>
+  <div class="s-body">
+    <div class="grid3">
+      <div class="k-card fu" style="--d:.05s">
+        <div class="k-card-t"><span class="no">29.1</span>PPO Clip</div>
+        <div class="k-code"><pre>L = E[ min(rₜÂₜ, clip(rₜ, 1±ε)Âₜ) ]
+rₜ = πθ(aₜ|sₜ) / πold(aₜ|sₜ)</pre></div>
+        <div class="k-card-b">比率偏离限 <b>±20%</b>,TRPO 的一阶近似。</div>
+      </div>
+      <div class="k-card fu" style="--d:.12s">
+        <div class="k-card-t"><span class="no">29.2</span>DPO</div>
+        <div class="k-code"><pre>L = −E[ log σ( β·log πθ(yw|x)/πref(yw|x)
+              − β·log πθ(yl|x)/πref(yl|x) ) ]</pre></div>
+        <div class="k-card-b">跳过 reward 模型,偏好对直接优化。</div>
+      </div>
+      <div class="k-card fu" style="--d:.19s">
+        <div class="k-card-t"><span class="no">29.3</span>GRPO</div>
+        <div class="k-code"><pre>Âᵢ = (rᵢ − μG) / σG
+→ 组内归一化后做 PPO clip(无 critic)</pre></div>
+        <div class="k-card-b">免 value 模型,适合可验证奖励。</div>
+      </div>
+    </div>
+    <div class="row fu" style="--d:.24s">
+      <div class="k-num"><b>0.1</b><span>β(DPO/KTO)·0.05–0.5</span></div>
+      <div class="k-num v"><b>0.2</b><span>ε·PPO clip·0.1–0.3</span></div>
+      <div class="k-num c"><b>1.0</b><span>γ 折扣·0.99–1.0</span></div>
+      <div class="k-num"><b>0.95</b><span>λ(GAE)·0.9–0.99</span></div>
+      <div class="k-num v"><b>5e-7</b><span>RLHF 学习率·1e-7–5e-6</span></div>
+      <div class="k-num c"><b>4–16</b><span>生成数 K·4–64</span></div>
+    </div>
+    <div class="grid2">
+      <div class="k-card fu" style="--d:.3s">
+        <div class="k-card-t"><span class="no">29.13</span>方法选择决策</div>
+        <div class="k-card-b">
+          成对偏好·干净 → <b>DPO</b>;噪声大 → IPO;显存紧 → ORPO<br>
+          只有二值反馈(赞/踩)→ <b>KTO</b><br>
+          可验证奖励(数学/代码)→ <b>GRPO</b><br>
+          不惜代价求极致质量 → <b>PPO</b> · 免训练改进 → <b>Best-of-N</b><br>
+          自适应 KL:系数 <b>0.01–0.2</b>,目标 KL≈5–8
+        </div>
+      </div>
+      <table class="k-table fu" style="--d:.36s">
+        <thead><tr><th>症状</th><th>根因</th><th>修复(29.12)</th></tr></thead>
+        <tbody>
+          <tr><td>奖励升 · 质量降</td><td>奖励黑客</td><td>RM 集成、长度惩罚、增大 β</td></tr>
+          <tr><td>KL 爆炸(&gt;15)</td><td>LR 过高 / 模式崩溃</td><td>降 LR、回滚 checkpoint</td></tr>
+          <tr><td>熵塌缩</td><td>过早收敛</td><td>增大熵系数、提高温度</td></tr>
+          <tr><td>5K 步后无提升</td><td>Prompt 分布不当</td><td>Goldilocks 过滤(通过率 20–80%)</td></tr>
+          <tr><td>基准性能回退</td><td>对齐税</td><td>减 RL 预算、改用 LoRA、混入 SFT</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C180,10 340,74 520,44 S900,10 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="140" cy="34" r="4.5"/><text x="113" y="20">核心公式</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="388" cy="52" r="4.5"/><text x="360" y="72">超参范围</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="717" cy="23" r="4.5"/><text x="690" y="9">方法选型</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="1034" cy="31" r="4.5"/><text x="1007" y="51">失效修复</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part VI 自测与参考</span><span class="pg">p561-567</span></footer>
+</section>

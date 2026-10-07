@@ -1,0 +1,49 @@
+<!-- ▸ c24code · 代码实战:生产级循环的伪代码 -->
+<section class="slide codeslide" id="c24code" data-part="5" data-crumb="PART V · 代码 19" data-title="循环引擎伪代码">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">§19.3-19.4 · 书 p368-369</span><span class="tag c">Python</span><span class="tag c">伪代码</span></div>
+    <h2 class="k-h">生产级循环的伪代码<span class="en">THE CANONICAL AGENT LOOP</span></h2>
+    <p class="k-lede">书 19.3-19.4:五个原语(自动化·工作树·技能·连接器·子 Agent)外加外部状态持久化,装配成一段恒温器式的规范循环——推理、行动、回填、终止判定。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">def</span> <span class="f">agent_loop</span>(goal: <span class="k">str</span>, max_steps: <span class="k">int</span> = 50,
+               budget: TokenBudget = <span class="k">None</span>):
+    <span class="s">"""The canonical agent loop structure."""</span>
+    state = <span class="f">initialize_state</span>(goal)     <span class="c">① 加载外部状态和目标</span>
+    <span class="k">for</span> step <span class="k">in</span> <span class="f">range</span>(max_steps):
+        thought = model.<span class="f">reason</span>(state)  <span class="c">② 推理(ReAct 风格)</span>
+        action = model.<span class="f">choose_action</span>(state)
+        observation = environment.<span class="f">execute</span>(action)
+        state = <span class="f">update_state</span>(state, thought, action, observation)
+        <span class="k">if</span> state.token_count &gt; CONTEXT_BUDGET * 0.8:
+            state = <span class="f">compact</span>(state)      <span class="c">汇总旧步骤</span>
+        <span class="k">if</span> verifier.<span class="f">passes</span>(state, goal): <span class="c">③ 确定性检查</span>
+            <span class="f">persist_state</span>(state, status=<span class="s">"success"</span>)
+            <span class="k">return</span> <span class="f">Success</span>(state)
+        <span class="k">if</span> <span class="f">no_progress_detected</span>(state, window=3):  <span class="c">④ 无进展</span>
+            <span class="f">persist_state</span>(state, status=<span class="s">"stuck"</span>)
+            <span class="k">return</span> <span class="f">escalate_to_human</span>(state)
+        <span class="k">if</span> budget <span class="k">and</span> budget.<span class="f">exhausted</span>():
+            <span class="f">persist_state</span>(state, status=<span class="s">"budget_exceeded"</span>)
+            <span class="k">return</span> <span class="f">escalate_to_human</span>(state)
+    <span class="f">persist_state</span>(state, status=<span class="s">"max_steps"</span>)   <span class="c">⑤ 硬性上限</span>
+    <span class="k">return</span> <span class="f">escalate_to_human</span>(state)</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①</span>外部状态为何放循环外</div><div class="k-card-b">LLM 在两次调用间是无状态的,循环连续性必须驻留磁盘——Markdown 进度文件、数据库或 git 日志;开局加载、每个出口回写,即进度·失败记忆·审计轨迹。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">②</span>一次迭代的执行流</div><div class="k-card-b">推理→选动作→环境执行→回填状态(ReAct 风格);token 超预算 80% 即 compact 汇总旧步骤——丢弃噪声的同时保留相关历史,这就是上下文管理。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">③</span>验证器是循环的灵魂</div><div class="k-card-b">verifier.passes 是确定性检查:循环的可靠程度不会超过它最不可靠的那一步验证;绝不让生成模型评判自己的输出——制造者与检查者必须分离。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">④⑤</span>终止条件:上限与无进展</div><div class="k-card-b">success / stuck(3 步无进展)/ budget_exceeded / max_steps=50 硬上限;每个出口都先 persist_state 再 escalate_to_human——状态文件即审计轨迹。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>此为 §19.4 结构模板;最小可运行实例是 19.5.1 验证循环:for attempt in range(MAX_ATTEMPTS) 内 run_tests(),失败即带失败日志重试;预期:测试转绿退出,或重试预算耗尽升级人类。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="126" y="16">状态外置</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="48" r="4.5"/><text x="364" y="68">单步迭代</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="608" y="14">验证器</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="844" y="64">终止出口</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p368-369</span></footer>
+</section>

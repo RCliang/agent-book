@@ -1,0 +1,51 @@
+<!-- ▸ c31a · CH26 Agent 开发框架:工程鸿沟·生命周期五阶段·七大框架剖析 -->
+<section class="slide" id="c31a" data-part="5" data-crumb="PART V · CH 26" data-title="框架:LangGraph·AutoGen·CrewAI">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 26</span><span class="dim">书 p463-477</span><span class="tag c">LangGraph</span><span class="tag c">AutoGen</span></div>
+    <h2 class="k-h">Agent 开发框架<span class="en">LANGGRAPH · AUTOGEN · CREWAI · DSPy</span></h2>
+    <p class="k-lede">在 notebook 里搭一个能干活的 Agent 不难,难的是边界情况、故障恢复、负载扩展与持续改进。五阶段生命周期与七种主流框架,正是跨越这条<b>工程鸿沟</b>的脚手架。</p>
+  </header>
+  <div class="s-body">
+    <ul class="k-flow fu" style="--d:.05s">
+      <li>设计·能力边界</li><li>实现·Prompt+Tool+编排</li><li>测试·多粒度</li><li>部署·异步可续跑</li><li>迭代·失败驱动改进</li>
+    </ul>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.12s">
+          <div class="k-card-t"><span class="no">01</span>工程能力的鸿沟</div>
+          <div class="k-card-b">原型假设友善环境:格式良好的输入、可用的 Tool、耐心的旁观者。生产面临五维鸿沟——<b class="hl">可靠性·可观测·可测试·部署·迭代</b>,错误处理必须系统化。</div>
+        </div>
+        <div class="k-card fu" style="--d:.2s">
+          <div class="k-card-t"><span class="no">02</span>设计阶段·定能力边界</div>
+          <div class="k-card-b">能力矩阵列出该做、必拒与范围外,是后续评测依据;Tool 过多反致<span class="cy">选择混乱、延迟上升</span>;约束须编入系统 Prompt 且以程序强制。</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="fu" style="--d:.18s">
+          <table class="k-table">
+            <thead><tr><th>框架</th><th>抽象核心</th><th>最适合</th></tr></thead>
+            <tbody>
+              <tr><td>LangGraph(LangChain)</td><td>有向图·State·条件边·子图</td><td>显式控制·检查点·人机协同</td></tr>
+              <tr><td>AutoGen(Microsoft)</td><td>可对话实体·群聊·沙箱代码执行</td><td>多智能体协作</td></tr>
+              <tr><td>CrewAI</td><td>角色·目标·背景故事·Process</td><td>最少样板的角色团队</td></tr>
+              <tr><td>OpenAI Agents SDK</td><td>Handoff 交接·Guardrail</td><td>OpenAI 生态多智能体</td></tr>
+              <tr><td>DSPy</td><td>Signature·优化器编译 Prompt</td><td>有指标的自动优化</td></tr>
+              <tr><td>Semantic Kernel(Microsoft)</td><td>插件架构·企业连接器</td><td>.NET/Azure 企业集成</td></tr>
+              <tr><td>NVIDIA OO Agents(NOOA)</td><td>Agent 即 Python 对象·代码即动作</td><td>极小抽象·研究级</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.3s"><b>成熟度五级</b>原型→Alpha→Beta→生产→成熟;大多数团队低估第 2→3 级的跨度——引入框架、自动化测试与预发布环境。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="126" y="16">工程鸿沟</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="304" y="72">生命周期</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="531" y="12">LangGraph</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="762" y="62">AutoGen</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="1007" y="66">DSPy</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p463-477</span></footer>
+</section>

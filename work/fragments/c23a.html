@@ -1,0 +1,100 @@
+<!-- ▸ c23a · CH 18 Agent Harness:上下文工程 -->
+<section class="slide" id="c23a" data-part="5" data-crumb="PART V · CH 18" data-title="Harness:上下文工程">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 18</span><span class="dim">书 p341-350</span><span class="tag c">CONTEXT</span><span class="tag c">MCP</span></div>
+    <h2 class="k-h">Agent Harness:上下文工程<span class="en">CONTEXT WINDOW · PROMPT · TOOLS</span></h2>
+    <p class="k-lede">模型与真实任务之间隔着一层基础设施:harness 管记忆、路由工具、跟踪状态、强制安全——设计糟糕会抵消最强 LLM,设计良好则放大中等模型。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.05s">
+          <div class="k-card-t"><span class="no">01</span>什么是 Harness</div>
+          <div class="k-card-b">包裹模型的运行时层:把无状态文本补全引擎变成有状态、目标导向的 Agent。模型是「大脑」,harness 是它的「操作系统」。</div>
+        </div>
+        <div class="k-card fu" style="--d:.12s">
+          <div class="k-card-t"><span class="no">02</span>Context 预算与压缩</div>
+          <div class="k-card-b">H 随对话无限涨,超限先压缩:滑动窗口、旧轮摘要(短 5-10×)、按相关性保留。递归语言模型 RLM 分块调用,规避 context rot。</div>
+        </div>
+        <div class="k-card fu" style="--d:.19s">
+          <div class="k-card-t"><span class="no">03</span>Prompt 架构</div>
+          <div class="k-card-b">System prompt 四件套:人格·能力·约束·输出格式;运行时按块组装、独立版本化;few-shot 按相关性选例并轮换。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">04</span>工具·安全·MCP</div>
+          <div class="k-card-b">签名五要素:名称·描述·参数·输出·约束;大库检索预筛 top-k;输出截断+错误归一;沙箱执行防注入;MCP 统一接入——详见 CH 22。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 400" role="img" aria-label="Agent Harness 解剖:LLM 居中,harness 在四周供给 system prompt、工具、记忆、状态与护栏;底部为 context 预算分配条">
+          <!-- 顶左:System Prompt -->
+          <rect x="52" y="26" width="200" height="68" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+          <text x="152" y="52" text-anchor="middle" style="font-weight:700">System Prompt</text>
+          <text class="mut" x="152" y="72" text-anchor="middle" style="font-size:11px">人格·能力·约束·输出格式</text>
+          <!-- 顶右:工具 -->
+          <rect x="608" y="26" width="200" height="68" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+          <text x="708" y="48" text-anchor="middle" style="font-weight:700">工具 Tools</text>
+          <text class="mut" x="708" y="66" text-anchor="middle" style="font-size:11px">schema·路由·沙箱执行</text>
+          <text x="708" y="84" text-anchor="middle" fill="var(--amber)" style="font-size:10px">MCP 统一协议 · 详见 CH 22</text>
+          <!-- 左:记忆 -->
+          <rect x="28" y="158" width="190" height="68" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+          <text x="123" y="184" text-anchor="middle" style="font-weight:700">记忆 Memory</text>
+          <text class="mut" x="123" y="204" text-anchor="middle" style="font-size:11px">窗口·scratchpad·向量库</text>
+          <!-- 右:状态 -->
+          <rect x="642" y="158" width="190" height="68" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)" stroke-width="1.2"/>
+          <text x="737" y="184" text-anchor="middle" style="font-weight:700">状态 State</text>
+          <text class="mut" x="737" y="204" text-anchor="middle" style="font-size:11px">对话·任务·信念·检查点</text>
+          <!-- 下:护栏 -->
+          <rect x="300" y="246" width="260" height="54" rx="8" fill="var(--verm-bg)" stroke="rgba(255,82,56,.4)" stroke-width="1.2"/>
+          <text x="430" y="268" text-anchor="middle" style="font-weight:700">护栏 Guardrails</text>
+          <text class="mut" x="430" y="288" text-anchor="middle" style="font-size:11px">审批门·循环检测·预算执行</text>
+          <!-- 中心:LLM -->
+          <g class="pop" style="--d:.15s">
+            <rect x="350" y="118" width="160" height="80" rx="10" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+            <text x="430" y="148" text-anchor="middle" fill="var(--amber)" style="font-size:17px;font-weight:700">LLM</text>
+            <text class="mut" x="430" y="169" text-anchor="middle" style="font-size:11px">唯一职责:推理</text>
+            <text class="m" x="430" y="186" text-anchor="middle" style="font-size:10.5px">f:tokens→tokens</text>
+          </g>
+          <!-- 连线:harness 各块供给模型 -->
+          <line class="draw" style="--d:.35s" pathLength="1" x1="240" y1="92" x2="350" y2="122" stroke="var(--cyan)" stroke-width="1.6"/>
+          <polygon points="356,124 345,126 348,117" fill="var(--cyan)"/>
+          <line class="draw" style="--d:.5s" pathLength="1" x1="620" y1="92" x2="510" y2="122" stroke="var(--cyan)" stroke-width="1.6"/>
+          <polygon points="504,124 515,126 512,117" fill="var(--cyan)"/>
+          <line class="draw" style="--d:.65s" pathLength="1" x1="218" y1="190" x2="342" y2="177" stroke="var(--cyan)" stroke-width="1.6"/>
+          <polygon points="348,175 339,181 338,171" fill="var(--cyan)"/>
+          <line class="draw" style="--d:.8s" pathLength="1" x1="642" y1="190" x2="518" y2="177" stroke="var(--cyan)" stroke-width="1.6"/>
+          <polygon points="512,175 521,181 522,171" fill="var(--cyan)"/>
+          <line class="draw" style="--d:.95s" pathLength="1" x1="430" y1="246" x2="430" y2="206" stroke="var(--cyan)" stroke-width="1.6"/>
+          <polygon points="430,200 425,210 435,210" fill="var(--cyan)"/>
+          <!-- 底部:Context 预算条(式 18.2) -->
+          <text x="60" y="336" style="font-weight:700;font-size:13px">Context 预算 C ≥ S+M+T+H+R<tspan fill="var(--faint)" style="font-size:11px">(式 18.2 固定分配)</tspan></text>
+          <text x="800" y="336" text-anchor="end" fill="var(--verm)" style="font-size:11.5px">超限即静默截断——发送前用模型 tokenizer 精确计数</text>
+          <rect x="60" y="346" width="74" height="30" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text class="m" x="97" y="365" text-anchor="middle" style="font-size:10.5px">S·10%</text>
+          <rect x="134" y="346" width="148" height="30" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text class="m" x="208" y="365" text-anchor="middle" style="font-size:10.5px">M·20%</text>
+          <rect x="282" y="346" width="74" height="30" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text class="m" x="319" y="365" text-anchor="middle" style="font-size:10.5px">T·10%</text>
+          <rect x="356" y="346" width="370" height="30" fill="var(--verm-bg)" stroke="rgba(255,82,56,.4)"/>
+          <text x="541" y="365" text-anchor="middle" fill="var(--verm)" style="font-size:11px">H·50% history 随对话无限增长 → 持续压缩</text>
+          <rect x="726" y="346" width="74" height="30" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text class="m" x="763" y="365" text-anchor="middle" style="font-size:10.5px">R·10%</text>
+          <text class="mut" x="97" y="392" text-anchor="middle" style="font-size:10px">system prompt</text>
+          <text class="mut" x="208" y="392" text-anchor="middle" style="font-size:10px">memory / RAG</text>
+          <text class="mut" x="319" y="392" text-anchor="middle" style="font-size:10px">tool defs</text>
+          <text class="mut" x="763" y="392" text-anchor="middle" style="font-size:10px">reserved 输出</text>
+        </svg>
+        <div class="figcap">图 18.1 · Harness 解剖:模型只负责推理,其余由 harness 供给;历史 H 占 50% 预算且随对话增长,须持续压缩</div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="124" y="16">窗口预算</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">压缩·RLM</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="540" y="12">Prompt</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="760" y="62">工具·沙箱</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="1010" y="66">MCP</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p341-350</span></footer>
+</section>

@@ -1,0 +1,92 @@
+<!-- ▸ c06c · CH01 解码·压缩·投机·安全 -->
+<section class="slide" id="c06c" data-part="1" data-crumb="PART I · CH 01" data-title="解码·压缩·投机·安全">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART I · CH 01</span><span class="dim">书 p86-106</span><span class="tag c">Top-p</span><span class="tag c">Eagle</span></div>
+    <h2 class="k-h">解码·压缩·投机·安全<span class="en">DECODING · COMPRESSION · SPECULATIVE · SAFETY</span></h2>
+    <p class="k-lede">概率分布已定,选哪个 token?如何把模型塞进显存、把解码提速 3×?最后是幻觉与安全——工程落地的最后一公里。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <table class="k-table fu" style="--d:.05s">
+          <thead><tr><th>方法</th><th>确定性</th><th>多样性</th><th>最佳适用</th></tr></thead>
+          <tbody>
+            <tr><td>Greedy</td><td>是</td><td>无</td><td>代码、事实问答</td></tr>
+            <tr><td>Beam(B=4–8)</td><td>是</td><td>低</td><td>翻译、摘要</td></tr>
+            <tr><td>Top-k(k=50)</td><td>否</td><td>中</td><td>通用生成</td></tr>
+            <tr><td>Top-p(p=0.9)</td><td>否</td><td>自适应</td><td>开放式默认</td></tr>
+            <tr><td>Min-p(p=0.1)</td><td>否</td><td>自适应</td><td>top-p 稳健替代</td></tr>
+          </tbody>
+        </table>
+        <div class="k-card fu" style="--d:.15s">
+          <div class="k-card-t"><span class="no">01</span>采样旋钮</div>
+          <div class="k-card-b">温度 T&lt;1 变尖、T→0 即贪心;重复惩罚 θ=1.1–1.3 把已生成 token 的 logit 推向零。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 300" role="img" aria-label="投机解码:草稿模型提议 k 个候选,目标模型一次前向并行验证">
+          <defs>
+            <marker id="arrC" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/></marker>
+          </defs>
+          <g class="pop" style="--d:.15s">
+            <rect x="24" y="108" width="196" height="76" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.5)"/>
+            <text x="122" y="132" text-anchor="middle" style="font-weight:700">草稿提议 Draft</text>
+            <text class="mut" x="122" y="152" text-anchor="middle" style="font-size:11px">小模型 · Medusa · Eagle</text>
+            <text class="mut" x="122" y="168" text-anchor="middle" style="font-size:11px">N-gram 缓存(零成本)</text>
+          </g>
+          <line class="draw" style="--d:.5s" x1="220" y1="146" x2="286" y2="146" stroke="var(--cyan)" stroke-width="2" marker-end="url(#arrC)"/>
+          <g class="pop" style="--d:.6s">
+            <rect x="290" y="96" width="246" height="104" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="302" y="122" style="font-weight:700">目标模型 · 一次前向传播</text>
+            <text class="mut" x="302" y="144" style="font-size:11px">并行验证全部候选 token</text>
+            <text class="m" x="302" y="168" style="font-size:11px">接受: P_tgt(ˆx) ≥ r·P_draft</text>
+            <text class="m" x="302" y="188" style="font-size:11px">拒绝: 于位置 j 重采样</text>
+          </g>
+          <line class="draw" style="--d:.9s" x1="536" y1="146" x2="582" y2="146" stroke="var(--cyan)" stroke-width="2" marker-end="url(#arrC)"/>
+          <text class="mut" x="538" y="132" style="font-size:11px">逐位判定</text>
+          <g class="pop" style="--d:1.05s">
+            <rect x="588" y="122" width="82" height="46" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.5)"/>
+            <text class="m" x="629" y="142" text-anchor="middle" style="font-size:12px">候选 1</text>
+            <text x="629" y="159" text-anchor="middle" style="font-size:11px">接受</text>
+            <rect x="678" y="122" width="82" height="46" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.5)"/>
+            <text class="m" x="719" y="142" text-anchor="middle" style="font-size:12px">候选 2</text>
+            <text x="719" y="159" text-anchor="middle" style="font-size:11px">接受</text>
+            <rect x="768" y="122" width="82" height="46" rx="6" fill="var(--verm-bg)" stroke="var(--verm)" stroke-width="1.5"/>
+            <text class="m" x="809" y="142" text-anchor="middle" style="font-size:12px">候选 3</text>
+            <text x="809" y="159" text-anchor="middle" style="font-size:11px" fill="var(--verm)">拒绝</text>
+          </g>
+          <line class="draw" style="--d:1.25s" x1="809" y1="168" x2="809" y2="204" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arrC)"/>
+          <text class="mut" x="809" y="224" text-anchor="middle" style="font-size:11px">重采样 x_j</text>
+          <text class="mut" x="809" y="240" text-anchor="middle" style="font-size:11px">丢弃其后候选</text>
+          <text x="24" y="236">α=0.8、k=5 → 每步期望 <tspan fill="var(--amber)" style="font-weight:700">3.4 个 token</tspan>,输出分布与目标<tspan fill="var(--verm)" style="font-weight:700">完全一致</tspan>(无质量损失)</text>
+          <text class="mut" x="24" y="262" style="font-size:11px">加速:标准 2–3× · Medusa 2–3× · Eagle 2.5–3.5× · Eagle-2 3–4× · N-gram 1.5–2×(表 1.19)· Eagle 接受率 85–95%</text>
+        </svg>
+        <div class="figcap">图 · 投机解码:草稿提议 k 个候选,目标模型一次前向并行验证——分布与标准解码完全一致</div>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="k-card fu" style="--d:.22s">
+        <div class="k-card-t"><span class="no">02</span>约束解码</div>
+        <div class="k-card-b">JSON Schema→正则→FSM,每步按状态掩掉非法 token;Outlines、XGrammar 保证语法合法。</div>
+      </div>
+      <div class="k-card fu" style="--d:.3s">
+        <div class="k-card-t"><span class="no">03</span>压缩三件套</div>
+        <div class="k-card-b">量化 W4A16 省 2× 内存、损失 &lt;1%;剪枝 SparseGPT 达 50% 稀疏;蒸馏迁移教师「暗知识」。</div>
+      </div>
+      <div class="k-card fu" style="--d:.38s">
+        <div class="k-card-t"><span class="no">04</span>幻觉与安全</div>
+        <div class="k-card-b">幻觉分内在/外在/忠实性;检测靠高熵、SelfCheckGPT、语义熵。安全威胁:有害·偏见·隐私·越狱·虚假·双用途。</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.46s"><b>反直觉</b> 检测器测的是不确定性,不是错误性——模型可能自信且一致地犯错;可靠检测需结合 RAG 验证。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s" transform="translate(150,30)"><circle r="4.5"/><text y="-10">解码采样</text></g>
+    <g class="rn" style="--d:.55s" transform="translate(330,52)"><circle r="4.5"/><text y="18">约束 FSM</text></g>
+    <g class="rn" style="--d:.8s" transform="translate(560,26)"><circle r="4.5"/><text y="-10">压缩</text></g>
+    <g class="rn" style="--d:1.05s" transform="translate(790,42)"><circle r="4.5"/><text y="18">投机解码</text></g>
+    <g class="rn" style="--d:1.3s" transform="translate(1020,46)"><circle r="4.5"/><text y="-10">安全</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part I 基础</span><span class="pg">p86-106</span></footer>
+</section>

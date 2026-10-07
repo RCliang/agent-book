@@ -1,0 +1,100 @@
+<!-- ▸ c06b · CH01 训练:优化器·SFT·LoRA·MoE -->
+<section class="slide" id="c06b" data-part="1" data-crumb="PART I · CH 01" data-title="训练:优化器·SFT·LoRA·MoE">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART I · CH 01</span><span class="dim">书 p62-85</span><span class="tag c">AdamW</span><span class="tag c">Muon</span></div>
+    <h2 class="k-h">训练:优化器·SFT·LoRA·MoE<span class="en">ADAMW · MUON · FLASHATTENTION · LIMA</span></h2>
+    <p class="k-lede">预训练目标只有一句话:预测下一个 token。之后的每个阶段——更好的优化器、低秩适配、稀疏专家——都在为它省算力。</p>
+  </header>
+  <div class="s-body">
+    <ul class="k-flow fu" style="--d:.05s">
+      <li>预训练 · 15T token</li><li>中期训练 · RL 就绪</li><li>SFT · LIMA 1K 精选</li><li>RLHF / DPO</li>
+    </ul>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>优化器:SGD→AdamW→Muon</div>
+          <div class="k-card-b">SGD 败于梯度尺度悬殊与稀疏梯度;AdamW 解耦权重衰减成默认;Muon 正交化动量,大规模预训练省约 2×。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>学习率与数据质量</div>
+          <div class="k-card-b">学习率第一:预训练 3e-4、SFT 2e-5、LoRA 2e-4,预热 1–5%;LIMA 证明 1,000 精选 &gt; 5 万嘈杂。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">03</span>LoRA:低秩适配</div>
+          <div class="k-card-b">冻结主干,只训低秩 BA(缩放 α/r);r=16 默认,32–64 接近全量;70B 全量 560 GB→QLoRA 44 GB。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 320" role="img" aria-label="MoE 层:Noisy Top-K 门控,每 token 仅激活 2 个专家">
+          <defs>
+            <marker id="arrB" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/></marker>
+          </defs>
+          <text class="m" x="24" y="34" style="font-size:12px">MoE(x) = Σ g_i(x)·E_i(x)</text>
+          <text class="mut" x="24" y="56" style="font-size:11px">N=8–64 专家,每 token 仅激活 K=2;容量随 N,算力随 K/N</text>
+          <text class="m mut" x="178" y="106" style="font-size:11px">H(x) = h(x) + ε·Softplus(W_noise·x)</text>
+          <text class="mut" x="424" y="106" style="font-size:11px">可学习噪声</text>
+          <line x1="257" y1="112" x2="257" y2="128" stroke="var(--cyan)" stroke-width="1.2" stroke-dasharray="4 4" marker-end="url(#arrB)"/>
+          <g class="pop" style="--d:.1s">
+            <rect x="24" y="146" width="104" height="52" rx="6" fill="var(--ink1)" stroke="var(--line)"/>
+            <text x="76" y="168" text-anchor="middle" style="font-weight:700">token</text>
+            <text class="mut" x="76" y="186" text-anchor="middle" style="font-size:11px">隐藏状态 x</text>
+          </g>
+          <line x1="128" y1="172" x2="172" y2="172" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arrB)"/>
+          <g class="pop" style="--d:.3s">
+            <rect x="178" y="132" width="158" height="80" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="257" y="158" text-anchor="middle" style="font-weight:700">路由器 Router</text>
+            <text class="m" x="257" y="178" text-anchor="middle" style="font-size:11px">TopK(softmax(W_r·x))</text>
+            <text class="mut" x="257" y="198" text-anchor="middle" style="font-size:11px">仅 Top-2 门控非零</text>
+          </g>
+          <line x1="336" y1="172" x2="516" y2="34" stroke="var(--line)" stroke-width="1"/>
+          <line class="draw" style="--d:.6s" x1="336" y1="172" x2="516" y2="72" stroke="var(--cyan)" stroke-width="2" marker-end="url(#arrB)"/>
+          <line x1="336" y1="172" x2="516" y2="110" stroke="var(--line)" stroke-width="1"/>
+          <line x1="336" y1="172" x2="516" y2="148" stroke="var(--line)" stroke-width="1"/>
+          <line class="draw" style="--d:.9s" x1="336" y1="172" x2="516" y2="186" stroke="var(--cyan)" stroke-width="2" marker-end="url(#arrB)"/>
+          <line x1="336" y1="172" x2="516" y2="224" stroke="var(--line)" stroke-width="1"/>
+          <line x1="336" y1="172" x2="516" y2="262" stroke="var(--line)" stroke-width="1"/>
+          <line x1="336" y1="172" x2="516" y2="300" stroke="var(--line)" stroke-width="1"/>
+          <rect x="520" y="20" width="234" height="28" rx="5" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="mut" x="637" y="38" text-anchor="middle" style="font-size:12px">专家 E1</text>
+          <g class="pop" style="--d:.75s">
+            <rect x="520" y="58" width="234" height="28" rx="5" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="637" y="76" text-anchor="middle" style="font-size:12px;font-weight:700">专家 E2</text>
+            <text class="m" x="744" y="76" text-anchor="end" style="font-size:11px" fill="var(--amber)">g=0.63</text>
+          </g>
+          <rect x="520" y="96" width="234" height="28" rx="5" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="mut" x="637" y="114" text-anchor="middle" style="font-size:12px">专家 E3</text>
+          <rect x="520" y="134" width="234" height="28" rx="5" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="mut" x="637" y="152" text-anchor="middle" style="font-size:12px">专家 E4</text>
+          <g class="pop" style="--d:1.05s">
+            <rect x="520" y="172" width="234" height="28" rx="5" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+            <text x="637" y="190" text-anchor="middle" style="font-size:12px;font-weight:700">专家 E5</text>
+            <text class="m" x="744" y="190" text-anchor="end" style="font-size:11px" fill="var(--amber)">g=0.31</text>
+          </g>
+          <rect x="520" y="210" width="234" height="28" rx="5" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="mut" x="637" y="228" text-anchor="middle" style="font-size:12px">专家 E6</text>
+          <rect x="520" y="248" width="234" height="28" rx="5" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="mut" x="637" y="266" text-anchor="middle" style="font-size:12px">专家 E7</text>
+          <rect x="520" y="286" width="234" height="28" rx="5" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="mut" x="637" y="304" text-anchor="middle" style="font-size:12px">专家 E8</text>
+          <path d="M754,72 C792,72 800,98 800,118" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+          <path d="M754,186 C792,186 800,160 800,140" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+          <circle cx="800" cy="129" r="9" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <text x="800" y="134" text-anchor="middle" style="font-size:12px">+</text>
+          <line x1="809" y1="129" x2="832" y2="129" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arrB)"/>
+          <text class="mut" x="820" y="150" text-anchor="middle" style="font-size:11px">输出</text>
+        </svg>
+        <div class="figcap">图 1.11 · MoE 层(Noisy Top-K 门控):容量随 N 增长、算力只随 K/N 增长;噪声让弱势专家偶尔入选、拿到梯度</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>FlashAttention</b> 不改数学只改访存:分块进 SRAM+在线 softmax,显存 O(N²)→O(N),快 2–4×。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s" transform="translate(150,30)"><circle r="4.5"/><text y="-10">优化器</text></g>
+    <g class="rn" style="--d:.55s" transform="translate(330,52)"><circle r="4.5"/><text y="18">FA 分块</text></g>
+    <g class="rn" style="--d:.8s" transform="translate(560,26)"><circle r="4.5"/><text y="-10">SFT</text></g>
+    <g class="rn" style="--d:1.05s" transform="translate(790,42)"><circle r="4.5"/><text y="18">LoRA</text></g>
+    <g class="rn" style="--d:1.3s" transform="translate(1020,46)"><circle r="4.5"/><text y="-10">MoE</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part I 基础</span><span class="pg">p62-85</span></footer>
+</section>

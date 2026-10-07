@@ -1,0 +1,59 @@
+<!-- ▸ c19a · LLM 评估:方案·数据·指标(第 14 章上) -->
+<section class="slide" id="c19a" data-part="4" data-crumb="PART IV · CH 14" data-title="评估:数据·指标">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART IV · CH 14</span><span class="dim">书 p274-284</span><span class="tag c">Pass@k</span><span class="tag c">ELO</span></div>
+    <h2 class="k-h">评估数据与指标<span class="en">TAXONOMY · SYNTHETIC DATA · METRICS · RANKING</span></h2>
+    <p class="k-lede">评估 LLM 难在:输出空间无界、质量多维、评估本身也是语言任务。先定方案再采数:分类法定测量,合成数据补规模,指标跟着任务类型走。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>2,294</b><span>SWE-bench 任务·12 个 Python 仓库</span></div>
+      <div class="k-num v"><b>~43%</b><span>SWE-bench Verified 最佳开源(人类 ~87%)</span></div>
+      <div class="k-num c"><b>812</b><span>WebArena 任务·5 个 Web 应用</span></div>
+      <div class="k-num"><b>35–45%</b><span>WebArena SOTA(人类 ~78%)</span></div>
+    </div>
+    <div class="grid2">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>评估类型分类法</div>
+          <div class="k-card-b">三个轴:内在(困惑度·BLEU·pass@k)vs 外在(系统效用);自动 vs 人工;基于参考 vs 无参考。内在快速迭代,外在终验。</div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>人工标注流水线</div>
+          <div class="k-card-b">五阶段:任务定义→规范→招募培训→金标质控→聚合。Cohen's κ(2 人)/Fleiss' κ(多人)修正偶然一致:&gt;0.6 可接受,&gt;0.8 强。</div>
+        </div>
+        <div class="k-card fu" style="--d:.22s">
+          <div class="k-card-t"><span class="no">03</span>合成评估数据</div>
+          <div class="k-card-b">Self-Instruct 从 175 种子自举,ROUGE-L&gt;0.7 去重;Evol-Instruct 深度/广度演化;CAI 依宪法批评修订,免标有害内容。</div>
+        </div>
+      </div>
+      <div class="col">
+        <table class="k-table fu" style="--d:.15s">
+          <thead><tr><th>任务</th><th>代表指标</th><th>人类相关</th></tr></thead>
+          <tbody>
+            <tr><td>翻译</td><td>BLEU:n-gram 精度+简短惩罚 BP</td><td>低–中</td></tr>
+            <tr><td>摘要</td><td>ROUGE:召回导向,L 用 LCS</td><td>中</td></tr>
+            <tr><td>通用 NLG</td><td>BERTScore:上下文嵌入+IDF</td><td>高</td></tr>
+            <tr><td>语言模型</td><td>困惑度 PPL:同分词才可比</td><td>低</td></tr>
+            <tr><td>代码生成</td><td>Pass@k:n=200 样本无偏估计</td><td>极高</td></tr>
+            <tr><td>Agent</td><td>TSR · 轨迹效率 η=L*/L · 工具调用 TUA</td><td>Oracle</td></tr>
+          </tbody>
+        </table>
+        <div class="k-card">
+          <div class="k-card-t"><span class="no">04</span>排名系统</div>
+          <div class="k-card-b">ELO:400 分差=10:1 胜率(Arena 用 K=4,Bootstrap CI);BT:最大似然,全量历史优于顺序 ELO;TrueSkill:高斯 μ/σ 量不确定性。</div>
+        </div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.32s"><b>基准方法论</b>SWE-bench:issue+仓库→生成 patch→跑测试套件,%Resolved 为指标;WebArena:沙箱浏览器,按应用状态/URL/程序化脚本判定。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="120" y="16">分类法</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="302" y="72">标注 κ</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="528" y="12">合成数据</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="758" y="62">Pass@k</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="986" y="66">ELO 排名</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part IV 评估</span><span class="pg">p274-284</span></footer>
+</section>

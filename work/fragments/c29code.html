@@ -1,0 +1,49 @@
+<!-- ▸ c29code · 代码实战:A2A 多 Agent 研究工作流 -->
+<section class="slide" id="c29code" data-part="5" data-crumb="PART V · 代码 24" data-title="A2A 研究工作流">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">书 24.9 · p435-441</span><span class="tag c">Python</span><span class="tag c">httpx · A2A</span></div>
+    <h2 class="k-h">A2A 多 Agent 研究工作流<span class="en">DISCOVER · DISPATCH · AWAIT · SYNTHESIZE</span></h2>
+    <p class="k-lede">书 24.9:OrchestratorAgent 借 A2A 把研究问题拆解后派给远程 ResearchAgent——发现、派发、等待、收集四步全走开放标准,不碰对方内部实现。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="c"># -- A2AClient(REST 绑定,节选)------------------</span>
+<span class="k">async def</span> <span class="f">get_agent_card</span>(self) -&gt; <span class="k">dict</span>:            <span class="c">① 发现能力卡片</span>
+    url = <span class="s">f"{self.agent_url}/.well-known/agent.json"</span>
+    <span class="k">async with</span> httpx.<span class="f">AsyncClient</span>() <span class="k">as</span> client:
+        <span class="k">return</span> (<span class="k">await</span> client.<span class="f">get</span>(url, headers=self.headers)).<span class="f">json</span>()
+<span class="k">async def</span> <span class="f">send_task</span>(self, message: Message, metadata: <span class="k">dict</span>) -&gt; Task:
+    payload = {<span class="s">"id"</span>: <span class="f">str</span>(uuid.<span class="f">uuid4</span>()), <span class="s">"message"</span>: message.<span class="f">model_dump</span>(),
+               <span class="s">"metadata"</span>: metadata}             <span class="c">② 提交任务</span>
+    <span class="k">...</span>  <span class="c"># POST {url}/tasks/send(Bearer 头,30s 超时)→ 初始 Task</span>
+<span class="k">async def</span> <span class="f">wait_for_completion</span>(self, task: Task) -&gt; Task:
+    <span class="k">while</span> task.status.state <span class="k">not in</span> {<span class="s">"completed"</span>, <span class="s">"failed"</span>, <span class="s">"canceled"</span>}:
+        <span class="k">await</span> asyncio.<span class="f">sleep</span>(2.0)                  <span class="c">③ 轮询至终止态</span>
+        task = <span class="k">await</span> self.<span class="f">get_task</span>(task.id)
+    <span class="k">return</span> task
+<span class="k">class</span> <span class="f">ResearchOrchestrator</span>:
+    <span class="k">async def</span> <span class="f">run</span>(self, research_question: <span class="k">str</span>) -&gt; <span class="k">str</span>:  <span class="c">④ 分解→并行派发→综合</span>
+        tasks = <span class="k">await</span> asyncio.<span class="f">gather</span>(*[self.research_client.<span class="f">send_task</span>(
+            <span class="f">Message</span>(role=<span class="s">"user"</span>, parts=[<span class="f">Part</span>(type=<span class="s">"text"</span>, text=q)]),
+            metadata={<span class="s">"workflowId"</span>: self.workflow_id, <span class="s">"subQuestion"</span>: i})
+            <span class="k">for</span> i, q <span class="k">in</span> <span class="f">enumerate</span>(self.<span class="f">_decompose</span>(research_question))])
+        <span class="k">...</span>  <span class="c"># 逐任务 wait_for_completion;取 artifacts 综合成报告</span>
+        <span class="k">return</span> self.<span class="f">_synthesize</span>(research_question, findings)</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①</span>Agent Card 驱动能力发现</div><div class="k-card-b">托管于 /.well-known/agent.json 的 JSON 清单,声明 skills、capabilities 与认证方式——编排器据此语义路由,类似面向自主 Agent 的 OpenAPI。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">②</span>异步优先:提交即返回</div><div class="k-card-b">send_task 立即返回 submitted 状态的 Task 而非结果;id 用 uuid4,metadata 带 workflowId/subQuestion——跨 Agent 追踪与交接全靠它。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">③</span>生命周期与等待策略</div><div class="k-card-b">状态机:submitted→working→completed/failed/canceled(另有 input-required)。短任务轮询足够;分钟级长任务应走 SSE 流或 webhook 推送,别挂长连接。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">④</span>并行派发,失败不炸</div><div class="k-card-b">gather 并行派发子问题,收齐后取各任务 artifacts 综合成报告;failed 只告警不中断。A2A 管 Agent↔Agent,与 MCP(Agent↔Tool)互补并用。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>依赖 httpx · fastapi · pydantic;先 uvicorn 起 ResearchAgent A2A Server,编排端 asyncio.run(main());预期:Decomposed into 3 sub-questions → Workflow complete. Report: N chars。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="130" y="16">能力发现</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="368" y="70">send_task</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="604" y="14">轮询或推送</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="846" y="64">产物综合</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p435-441</span></footer>
+</section>

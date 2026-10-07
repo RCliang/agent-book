@@ -1,0 +1,106 @@
+<!-- ▸ c12a · GRPO:组相对策略优化 -->
+<section class="slide" id="c12a" data-part="2" data-crumb="PART II · CH 07" data-title="GRPO:组相对策略优化">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 07</span><span class="dim">书 p158-160</span><span class="tag c">TRL 默认</span><span class="tag c">DeepSeek-R1</span></div>
+    <h2 class="k-h">组相对策略优化<span class="en">GRPO · GROUP RELATIVE POLICY OPTIMIZATION</span></h2>
+    <p class="k-lede">DeepSeek 在 DeepSeekMath 提出、R1 放大:不训练 critic,对同一 prompt 采 G 条响应,以组内 reward 统计量作基线——显存去掉一整个模型,往往还优于 PPO。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.05s">
+          <div class="k-card-t"><span class="no">01</span>动机:去掉 critic</div>
+          <div class="k-card-b">70B 的 value head 占 <b>140GB</b>;部分序列价值难预测;早期信号嘈杂、破坏稳定。</div>
+        </div>
+        <div class="k-card fu" style="--d:.12s">
+          <div class="k-card-t"><span class="no">02</span>机制:组内归一化</div>
+          <div class="k-card-b">采 G 条响应,<span class="cy">Â=(r−µ<sub>G</sub>)/σ<sub>G</sub></span>:组均值即 value 的蒙特卡洛估计,强化高于均值者。</div>
+        </div>
+        <div class="k-card fu" style="--d:.19s">
+          <div class="k-card-t"><span class="no">03</span>适用场景与 TRL</div>
+          <div class="k-card-b">可验证奖励与 <b>70B+</b> 模型;TRL:<span class="cy">num_generations=8</span> · beta=0.04 · use_vllm=True。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 248" role="img" aria-label="GRPO 组采样:一个 prompt 采样 G 条响应,组内 reward 归一化得到优势">
+          <!-- prompt -->
+          <rect x="20" y="75" width="132" height="64" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="86" y="103" text-anchor="middle" style="font-weight:700">prompt x</text>
+          <text class="mut" x="86" y="122" text-anchor="middle">同一道数学题</text>
+          <!-- fan-out -->
+          <line x1="154" y1="107" x2="222" y2="23" stroke="rgba(78,201,212,.35)" stroke-width="1"/>
+          <line x1="154" y1="107" x2="222" y2="65" stroke="rgba(78,201,212,.35)" stroke-width="1"/>
+          <line x1="154" y1="107" x2="222" y2="107" stroke="rgba(78,201,212,.35)" stroke-width="1"/>
+          <line x1="154" y1="107" x2="222" y2="149" stroke="rgba(78,201,212,.35)" stroke-width="1"/>
+          <line x1="154" y1="107" x2="222" y2="191" stroke="rgba(78,201,212,.35)" stroke-width="1"/>
+          <!-- G 条响应 -->
+          <rect x="226" y="6" width="250" height="34" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="240" y="27">y₁ · 答对</text>
+          <rect x="426" y="12" width="40" height="22" rx="11" fill="rgba(255,194,75,.14)"/>
+          <text class="m" x="446" y="27" text-anchor="middle" fill="var(--amber)" style="font-size:11px">r=1</text>
+          <rect x="226" y="48" width="250" height="34" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="240" y="69">y₂ · 答错</text>
+          <rect x="426" y="54" width="40" height="22" rx="11" fill="rgba(255,82,56,.12)"/>
+          <text class="m" x="446" y="69" text-anchor="middle" fill="var(--verm)" style="font-size:11px">r=0</text>
+          <rect x="226" y="90" width="250" height="34" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="240" y="111">y₃ · 答对</text>
+          <rect x="426" y="96" width="40" height="22" rx="11" fill="rgba(255,194,75,.14)"/>
+          <text class="m" x="446" y="111" text-anchor="middle" fill="var(--amber)" style="font-size:11px">r=1</text>
+          <rect x="226" y="132" width="250" height="34" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="240" y="153">y₄ · 答对</text>
+          <rect x="426" y="138" width="40" height="22" rx="11" fill="rgba(255,194,75,.14)"/>
+          <text class="m" x="446" y="153" text-anchor="middle" fill="var(--amber)" style="font-size:11px">r=1</text>
+          <rect x="226" y="174" width="250" height="34" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="240" y="195">y₅ · 答错</text>
+          <rect x="426" y="180" width="40" height="22" rx="11" fill="rgba(255,82,56,.12)"/>
+          <text class="m" x="446" y="195" text-anchor="middle" fill="var(--verm)" style="font-size:11px">r=0</text>
+          <text class="mut" x="351" y="226" text-anchor="middle">G = 5 条响应 · 高温采样 τ = 1.0</text>
+          <!-- 归一化 -->
+          <line class="draw" style="--d:.35s" x1="480" y1="107" x2="526" y2="107" stroke="var(--cyan)" stroke-width="1.8"/>
+          <polygon points="526,102 538,107 526,112" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:.55s" x="542" y="62" width="192" height="90" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.5)" stroke-width="1.5"/>
+          <text x="638" y="86" text-anchor="middle" style="font-weight:700">组内归一化</text>
+          <text class="m" x="638" y="110" text-anchor="middle">Â = (r − µ<tspan dy="3" style="font-size:10px">G</tspan><tspan dy="-3">) / σ</tspan><tspan dy="3" style="font-size:10px">G</tspan></text>
+          <text class="mut" x="638" y="132" text-anchor="middle">µ<tspan dy="3" style="font-size:10px">G</tspan><tspan dy="-3"> = 0.6 作基线</tspan></text>
+          <!-- 优势 -->
+          <path d="M734,88 H762 V39 H778" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="786,39 777,34.5 777,43.5" fill="var(--cyan)"/>
+          <path d="M734,126 H762 V173 H778" fill="none" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="786,173 777,168.5 777,177.5" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:.75s" x="788" y="16" width="60" height="46" rx="7" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <text class="m" x="818" y="36" text-anchor="middle" fill="var(--amber)" style="font-weight:700">Â&gt;0</text>
+          <text class="mut" x="818" y="53" text-anchor="middle" style="font-size:11px">强化 ×3</text>
+          <rect class="pop" style="--d:.95s" x="788" y="150" width="60" height="46" rx="7" fill="var(--ink0)" stroke="var(--verm)" stroke-width="1.8"/>
+          <text class="m" x="818" y="170" text-anchor="middle" fill="var(--verm)" style="font-weight:700">Â&lt;0</text>
+          <text class="mut" x="818" y="187" text-anchor="middle" style="font-size:11px">抑制 ×2</text>
+          <!-- 更新 -->
+          <line x1="638" y1="152" x2="638" y2="204" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="638,212 633,204 643,204" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:1.15s" x="542" y="214" width="192" height="28" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text class="m" x="638" y="232" text-anchor="middle" style="font-size:12px">PPO 式 clipped 更新 − β·D<tspan dy="3" style="font-size:9px">KL</tspan></text>
+        </svg>
+        <div class="figcap">图 7.1 · 组采样:G=5 条,µ<sub>G</sub>=0.6 作基线;组内须有对有错(prompt 过滤至 20-80% 通过率)</div>
+      </div>
+    </div>
+    <div class="grid2 fu" style="--d:.3s">
+      <table class="k-table">
+        <thead><tr><th>组大小 G</th><th>信号质量</th><th>使用场景</th></tr></thead>
+        <tbody>
+          <tr><td><b>4</b></td><td>中等</td><td class="mut">快速实验(通过率&gt;50%)</td></tr>
+          <tr><td><b>8</b></td><td>良好(标准)</td><td class="mut">默认,多数任务的良好平衡</td></tr>
+          <tr><td><b>16</b></td><td>极佳</td><td class="mut">困难任务(通过率&lt;20%)</td></tr>
+        </tbody>
+      </table>
+      <div class="k-callout" style="align-self:center"><b>去掉一整个模型</b>工程复杂度减半,效果反而常常更好——经验基线比训练不充分的 value function 更准确。</div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">无 critic</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="298" y="72">采样 G 条</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="528" y="12">组归一化</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="748" y="62">clipped 更新</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="990" y="66">R1 涌现</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II 对齐</span><span class="pg">p158-160</span></footer>
+</section>

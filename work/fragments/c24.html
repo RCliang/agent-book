@@ -1,0 +1,108 @@
+<!-- ▸ c24 · 循环工程(书 Ch 19, p365-377) -->
+<section class="slide" id="c24" data-part="5" data-crumb="PART V · CH 19" data-title="循环工程">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 19</span><span class="dim">书 p365-377</span><span class="tag c">Loop = RL</span><span class="tag am">Reflexion</span></div>
+    <h2 class="k-h">循环工程<span class="en">LOOP ENGINEERING</span></h2>
+    <p class="k-lede">提示工程、上下文工程、Harness 工程之后的第四层:设计迭代控制结构,让 Agent 无需逐轮指令、自主朝目标前进。精心设计的循环就是<b>推理时运行的强化学习</b>——只是权重不更新。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.08s">
+          <div class="k-card-t"><span class="no">01</span>循环 = 推理时强化学习</div>
+          <div class="k-card-b">奖励 = <span class="cy">验证信号</span>;策略 π 冻结,「学习」全靠状态累积。上下文管第 t 步看什么,循环管行动之后发生什么。</div>
+          <div class="k-code"><pre>st = context(st-1, at-1, ot-1)   at = πθ(st)
+ot = env(at)   rt = verify(st, at, ot)</pre></div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>五原语 · 外部状态 · 终止</div>
+          <div class="k-card-b">自动化·工作树·技能·连接器·<span class="cy">子 Agent</span>;状态驻留磁盘。终止:上限 <b class="hl">20-50</b> 步、预算、无进展 k=3、致命错误。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 270" role="img" aria-label="四种循环模式与验证层级">
+          <defs>
+            <marker id="ah24" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--cyan)"/></marker>
+          </defs>
+          <text x="107" y="20" text-anchor="middle" style="font-size:13px;font-weight:700">验证循环</text>
+          <text x="322" y="20" text-anchor="middle" style="font-size:13px;font-weight:700">Reflexion</text>
+          <text x="537" y="20" text-anchor="middle" style="font-size:13px;font-weight:700">评估器-优化器</text>
+          <text x="752" y="20" text-anchor="middle" style="font-size:13px;font-weight:700">层级循环</text>
+          <!-- 验证环 -->
+          <path class="draw" style="--d:.4s" pathLength="1" d="M140,98 A42,42 0 1,1 74,98 A42,42 0 1,1 140,98" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#ah24)"/>
+          <text x="107" y="90" text-anchor="middle">生成</text>
+          <text x="107" y="120" text-anchor="middle">验证</text>
+          <text class="mut" x="107" y="164" text-anchor="middle" style="font-size:11.5px">失败→重试,直到通过</text>
+          <!-- 反思环 -->
+          <path class="draw" style="--d:.55s" pathLength="1" d="M364,98 A42,42 0 1,1 280,98 A42,42 0 1,1 364,98" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#ah24)"/>
+          <text x="322" y="90" text-anchor="middle">执行</text>
+          <text x="322" y="120" text-anchor="middle">评估</text>
+          <rect class="pop" style="--d:.95s" x="257" y="144" width="130" height="22" rx="5" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)"/>
+          <text x="322" y="159" text-anchor="middle" style="font-size:11px">情景记忆:学到的教训</text>
+          <text x="322" y="184" text-anchor="middle" style="font-size:11.5px"><tspan fill="var(--amber)" style="font-weight:700">91%</tspan><tspan class="mut"> pass@1 · 基线 67%</tspan></text>
+          <!-- 评估环 -->
+          <rect x="497" y="50" width="80" height="24" rx="5" fill="var(--ink1)" stroke="rgba(78,201,212,.4)"/>
+          <text x="537" y="66" text-anchor="middle" style="font-size:12px">生成器</text>
+          <rect x="497" y="118" width="80" height="24" rx="5" fill="var(--ink1)" stroke="rgba(78,201,212,.4)"/>
+          <text x="537" y="134" text-anchor="middle" style="font-size:12px">评估器</text>
+          <path d="M519,76 C507,88 507,106 519,116" fill="none" stroke="var(--cyan)" stroke-width="1.6" marker-end="url(#ah24)"/>
+          <path d="M555,116 C567,106 567,88 555,76" fill="none" stroke="var(--verm)" stroke-width="1.6"/>
+          <text class="mut" x="537" y="164" text-anchor="middle" style="font-size:11.5px">评分超阈值或预算尽即停</text>
+          <!-- 层级环 -->
+          <path class="draw" style="--d:.7s" pathLength="1" d="M806,98 A54,54 0 1,1 698,98 A54,54 0 1,1 806,98" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#ah24)"/>
+          <circle class="pop" style="--d:1.05s" cx="752" cy="98" r="21" fill="none" stroke="var(--amber)" stroke-width="1.6"/>
+          <text x="752" y="102" text-anchor="middle" style="font-size:10.5px">子循环</text>
+          <text class="mut" x="752" y="164" text-anchor="middle" style="font-size:11.5px">编排:分解·监控·综合</text>
+          <!-- 验证层级 -->
+          <text class="m" x="30" y="198" style="font-size:11px;letter-spacing:.14em">验证层级 · 按可靠性排序 →</text>
+          <g class="pop" style="--d:1.25s">
+            <rect x="30" y="206" width="190" height="48" rx="6" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.3"/>
+            <text x="125" y="225" text-anchor="middle" style="font-size:12.5px;font-weight:700">编译 · 类型 · 测试</text>
+            <text x="125" y="243" text-anchor="middle" class="mut" style="font-size:11px">确定性 · 黄金标准</text>
+          </g>
+          <polygon points="224,224 232,230 224,236" fill="var(--cyan)"/>
+          <rect x="236" y="206" width="190" height="48" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)"/>
+          <text x="331" y="225" text-anchor="middle" style="font-size:12.5px;font-weight:700">Lint · 指标对比</text>
+          <text x="331" y="243" text-anchor="middle" class="mut" style="font-size:11px">确定性 · 数值信号</text>
+          <polygon points="430,224 438,230 430,236" fill="var(--cyan)"/>
+          <rect x="442" y="206" width="190" height="48" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="537" y="225" text-anchor="middle" style="font-size:12.5px;font-weight:700">LLM-as-judge</text>
+          <text x="537" y="243" text-anchor="middle" class="mut" style="font-size:11px">概率性 · 需人类校准</text>
+          <polygon points="636,224 644,230 636,236" fill="var(--cyan)"/>
+          <rect x="648" y="206" width="182" height="48" rx="6" fill="none" stroke="var(--line)"/>
+          <text x="739" y="225" text-anchor="middle" style="font-size:12.5px;font-weight:700">人工审查</text>
+          <text x="739" y="243" text-anchor="middle" class="mut" style="font-size:11px">黄金标准 · 高风险决策</text>
+        </svg>
+        <div class="figcap">图 19.1 · 循环模式自主性递增;研究环(AutoResearch)限时实验、提交/回滚。有确定性检查,绝不让模型自评。</div>
+      </div>
+    </div>
+    <div class="grid4">
+      <div class="k-card fu" style="--d:.26s">
+        <div class="k-card-t"><span class="no">03</span>Loopmaxxing</div>
+        <div class="k-card-b">多跑几轮≠优化;无梯度信号即随机搜索。</div>
+      </div>
+      <div class="k-card fu" style="--d:.31s">
+        <div class="k-card-t"><span class="no">04</span>理解债</div>
+        <div class="k-card-b">改码快过人审阅;理解差距无声复利。</div>
+      </div>
+      <div class="k-card fu" style="--d:.36s">
+        <div class="k-card-t"><span class="no">05</span>Reward Hacking</div>
+        <div class="k-card-b">删测试让 CI 变绿;多个独立检查防御。</div>
+      </div>
+      <div class="k-card fu" style="--d:.41s">
+        <div class="k-card-t"><span class="no">06</span>上下文劣化</div>
+        <div class="k-card-b">「中间迷失」;压缩·外化·子 Agent 隔离。</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.44s"><b>何时不该用循环</b>单轮任务、无可检查目标、人工更廉价、验证不可能——一个能解决问题的提示链,永远优于也许能解决的循环。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="131" y="16">自动化</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="298" y="72">推理·行动</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="533" y="12">验证 rt</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="764" y="62">反思记忆</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="988" y="66">终止·升级</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V</span><span class="pg">p365-377</span></footer>
+</section>

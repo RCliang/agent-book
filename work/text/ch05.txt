@@ -1,0 +1,124 @@
+[p36]
+缩略语表
+本指南使用了许多源自机器学习、系统工程与智能体研究的缩略语。以下速查表覆盖最常见的那些；
+每个条目都会在概念首次完整引入的章节中出现。
+A2A Agent-to-Agent（智能体到智能体通信协议）
+Adam W Adam with decoupled Weight decay （权重
+衰减解耦的 Adam）
+BDI Belief–Desire–Intention（信念 — 愿望 — 意图结
+构）
+BER T Bidirectional Encoder Representations from
+Transformers（Transformer 双向编码器表征）4
+BLEU Bilingual Evaluation Understudy （双语评估
+替补，指标）
+BPE Byte-Pair Encoding （字节对编码）
+BT Bradley–Terry（偏好模型）
+CoT Chain of Thought （思维链）
+CTDE Centralized Training, Decentralized Execu-
+tion（集中训练、分散执行）
+CUDA Compute Unified Device Architecture （统一
+计算设备架构）
+DAG Directed Acyclic Graph （有向无环图）
+DAPO Dynamic Adaptive Policy Optimization （动
+态自适应策略优化）
+DDP Distributed Data Parallel （分布式数据并行）
+DiLoCo Distributed Low-Communication（低通信分
+布式训练）
+DP Data Parallelism （数据并行）
+DPO Direct Preference Optimization （直接偏好优
+化）
+DQN Deep Q-Network（深度 Q 网络）
+DRAM Dynamic Random-Access Memory （动态随
+机存取存储器）
+ELO Elo rating system （以 Arpad Elo 命名的评分
+系统）
+EOS End of Sequence （序列结束，token）
+F A FlashAttention（注意力优化算法）1
+FFN Feed-Forward Network（前馈网络）
+FLOP Floating-Point Operation （浮点操作）
+FSDP Fully Sharded Data Parallel （全分片数据并
+行）
+GAE Generalized Advantage Estimation （广义优势
+估计）
+GAIA General AI Assistants （通用 AI 助手，基准）
+GEMM General Matrix Multiplication（通用矩阵乘
+法）
+GQA Grouped Query Attention （分组查询注意力）
+GRPO Group Relative Policy Optimization（组相对
+策略优化）
+HBM High Bandwidth Memory （高带宽内存）
+IPO Identity Preference Optimization （恒等偏好优
+化）2
+KL Kullback–Leibler（散度）
+KTO Kahneman–Tversky Optimization（Kahneman–
+Tversky 优化）2
+KV Key–Value（键值，缓存）
+LA TS Language Agent Tree Search （语言 Agent 树
+搜索）
+LLM Large Language Model （大语言模型）
+LoRA Low-Rank Adaptation（低秩适配）
+LR Learning Rate （学习率）
+MCP Model Context Protocol （模型上下文协议）
+MCTS Monte Carlo Tree Search （蒙特卡洛树搜索）
+MDP Markov Decision Process（马尔可夫决策过程）
+MFU Model FLOPS Utilization （模型算力利用率）
+MHA Multi-Head Attention（多头注意力）
+MLA Multi-head Latent Attention （多头潜在注意
+力）
+MLP Multi-Layer Perceptron（多层感知器）
+MoE Mixture of Experts （专家混合）
+NOOA NVIDIA Object-Oriented Agents （NVIDIA
+面向对象智能体）
+NLL Negative Log-Likelihood （负对数似然）
+OPSD On-Policy Self-Distillation （同策略自蒸馏）
+ORPO Odds Ratio Preference Optimization （优势
+比偏好优化）2
+ORM Outcome Reward Model （结果奖励模型）
+36
+[p37]
+H. Roitman — 智能体 AI 漫游指南：从基础到系统
+PEFT Parameter-Eﬀicient Fine-Tuning（参数高效微
+调）
+PP Pipeline Parallelism （流水线并行）
+PPO Proximal Policy Optimization（近端策略优化）
+PRM Process Reward Model （过程奖励模型）
+QLoRA Quantized Low-Rank Adaptation （量化低
+秩适配）
+RAG Retrieval-Augmented Generation（检索增强生
+成）
+ReAct Reasoning + Acting（推理 + 行动，Agent 模
+式）
+RL Reinforcement Learning （强化学习）
+RLHF Reinforcement Learning from Human Feed-
+back（基于人类反馈的强化学习）
+RL VR Reinforcement Learning with Verifiable Re-
+wards（基于可验证奖励的强化学习）
+RM Reward Model （奖励模型）
+RoPE Rotary Position Embedding （旋转位置编码）
+ROUGE Recall-Oriented Understudy for Gisting
+Evaluation（面向摘要评估的召回导向替身， 指
+标）
+RRF Reciprocal Rank Fusion （倒数排名融合）
+SDK Software Development Kit （软件开发工具包）
+SFT Supervised Fine-Tuning（监督微调）
+SGD Stochastic Gradient Descent（随机梯度下降法）
+SM Streaming Multiprocessor （流式多处理器）
+SPLADE SParse Lexical AnD Expansion （稀疏词
+法扩展）
+SRAM Static Random-Access Memory（静态随机存
+取存储器）
+SSE Server-Sent Events（服务器推送事件）
+SWE-bench Software Engineering Benchmark （软
+件工程基准）
+TD Temporal Difference（时序差分，学习）
+TP Tensor Parallelism（张量并行）
+TRL Transformer Reinforcement Learning （库）
+UCB Upper Confidence Bound （上置信界）
+vLLM vLLM（大语言模型推理与服务引擎）3
+译者注：本表优先采用国家审定术语和项目官方名称；对新近论文、协议、项目及基准，尚无统一中文译名时，保留英文
+缩写和英文全称，中文仅作常译或暂译，不构成规范术语。
+1 FlashAttention / FA暂无统一中文译名，保留为注意力优化算法。
+2 IPO、KTO 与 ORPO 暂无统一中文译名，ORPO 亦译“赔率比偏好优化” 。
+3 vLLM 为大语言模型推理与服务引擎，原文中的简称 Virtual LLM 并非项目主源确认的正式全称。
+4 BERT 的“表示/表征”两种译法并行。
+37

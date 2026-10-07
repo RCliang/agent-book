@@ -1,0 +1,36 @@
+<!-- ▸ c12b · GRPO 变体动物园 -->
+<section class="slide" id="c12b" data-part="2" data-crumb="PART II · CH 07" data-title="GRPO 变体动物园">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 07</span><span class="dim">书 p162-172</span><span class="tag c">11 个变体</span><span class="tag c">TRL loss_type</span></div>
+    <h2 class="k-h">GRPO 变体动物园<span class="en">DAPO · GSPO · CISPO · GOPO · …</span></h2>
+    <p class="k-lede">基础 GRPO 暴露四类失败:预训练偏差稀释梯度、对称 clipping 限制探索、组大小浪费、多目标 reward 失衡——变体家族逐一击破,TRL 大多 loss_type 一键切换。</p>
+  </header>
+  <div class="s-body">
+    <table class="k-table dense fu" style="--d:.05s">
+      <thead><tr><th>变体</th><th>解决什么</th><th>关键机制</th><th>何时用</th></tr></thead>
+      <tbody>
+        <tr><td><b>DAPO</b></td><td class="mut">对称 clip 限探索;全对全错组零梯度</td><td>Clip-Higher ε<sub>high</sub>=0.28 · token 级 loss · 动态采样</td><td>长推理;GRPO 不稳定时首选</td></tr>
+        <tr><td><b>GSPO</b></td><td class="mut">off-policy 下逐 token ratio 乘积爆炸(10<sup>50</sup>)</td><td>序列级几何平均重要性采样,整序列只 clip 一次</td><td>steps_per_generation&gt;1</td></tr>
+        <tr><td><b>Dr. GRPO</b></td><td class="mut">预训练常见 token 稀释梯度</td><td>按 (1−π<sub>ref</sub>) 降权,聚焦有信息 token(需 ref_model)</td><td>词表分布严重不匹配</td></tr>
+        <tr><td><b>2-GRPO</b></td><td class="mut">大 G 生成算力浪费</td><td>G=2,隐式 DPO 式对比;生成省 8×、端到端 4-6×</td><td>通过率适中的推理任务</td></tr>
+        <tr><td><b>SAPO</b></td><td class="mut">硬 clip 的梯度悬崖效应</td><td>sigmoid 软门控,温度 τ<sub>±</sub>=1.0/1.05;τ→0 回 PPO</td><td>clip 边界训练不稳</td></tr>
+        <tr><td><b>TIS / MIS</b></td><td class="mut">vLLM 与训练前向概率不匹配</td><td>截断修正(C=5)/ 超阈整条置零(C=3)</td><td>用 vLLM 生成时建议常开</td></tr>
+        <tr><td><b>VESPO</b></td><td class="mut">启发式改 clip 缺乏原理</td><td>变分核:平滑、非对称、指数衰减陈旧轨迹</td><td>异步 / off-policy 训练</td></tr>
+        <tr><td><b>DPPO</b></td><td class="mut">ratio clip 对低概率 token 过罚</td><td>直接 TV/KL 散度做信赖域(binary/topk mask)</td><td>研究阶段;概率高度偏斜任务</td></tr>
+        <tr><td><b>CISPO</b></td><td class="mut">组内基线不稳,单一 prompt 主导</td><td>batch 级 reward 缩放 + token 级 loss 协同</td><td>大规模 RL 推荐默认(ScaleRL)</td></tr>
+        <tr><td><b>GDPO</b></td><td class="mut">高方差 reward 主导,advantage 坍塌</td><td>每项独立归一化,再按权重 w<sub>n</sub> 聚合</td><td>多目标(正确性+格式)</td></tr>
+        <tr><td><b>GOPO</b></td><td class="mut">RM 绝对分数幅度无意义</td><td>只用组内序数 rank 作 advantage,对单调变换不变</td><td>不可验证奖励(摘要/聊天)</td></tr>
+      </tbody>
+    </table>
+    <div class="k-callout fu" style="--d:.25s"><b>选型速记</b>可验证奖励→GRPO/DAPO;主观 RM 任务→GOPO;off-policy→GSPO/VESPO;开 vLLM→TIS/MIS;大规模→CISPO。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="122" y="16">DAPO</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="302" y="72">GSPO</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="526" y="12">2-GRPO</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="762" y="62">CISPO</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="992" y="66">GOPO</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II 对齐</span><span class="pg">p162-172</span></footer>
+</section>

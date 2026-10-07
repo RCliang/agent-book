@@ -1,0 +1,36 @@
+<!-- ▸ c13 · 偏好优化变体(书 p173-180) -->
+<section class="slide" id="c13" data-part="2" data-crumb="PART II · CH 08" data-title="KTO·IPO·ORPO 选型">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 08</span><span class="dim">书 p173-180</span><span class="tag c">Online DPO</span><span class="tag c">KTO</span><span class="tag c">Best-of-N</span></div>
+    <h2 class="k-h">偏好优化变体<span class="en">ONLINE DPO · KTO · IPO · ORPO · BEST-OF-N</span></h2>
+    <p class="k-lede">五种变体各补 offline DPO 一块短板:Online 消<b>分布偏移</b>,KTO 凭前景理论只吃<b>二值反馈</b>,IPO 锁死 margin 抗过拟合,ORPO 免<b>参考模型</b>,Best-of-N 零训练成强基线。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>-50%</b><span>ORPO 显存:免参考,70B 省 70-140GB</span></div>
+      <div class="k-num v"><b>1/2β</b><span>IPO 目标 margin(DPO 最优在 ∞)</span></div>
+      <div class="k-num c"><b>+15-20%</b><span>Best-of-N N=64 胜率 vs greedy</span></div>
+      <div class="k-num"><b>λl &gt; λw</b><span>Kahneman-Tversky 前景理论:损失厌恶</span></div>
+    </div>
+    <table class="k-table fu" style="--d:.15s">
+      <thead><tr><th>方法</th><th>所需信号</th><th>reference 模型</th><th>何时选</th></tr></thead>
+      <tbody>
+        <tr><td><b>Online DPO</b></td><td>每步从 πθ 新鲜采样,RM 打分取最高/最低成 pair</td><td>要 · 3 模型</td><td>DPO 停滞、需要 on-policy 探索</td></tr>
+        <tr><td><b>KTO</b></td><td>未配对点赞/点踩(label true/false)</td><td>要 · 2 模型</td><td>生产二值反馈、类别不平衡、噪声标签</td></tr>
+        <tr><td><b>IPO</b></td><td>离线成对偏好(与 DPO 同格式)</td><td>要 · 2 模型</td><td>噪声数据、多 epoch、DPO 过拟合</td></tr>
+        <tr><td><b>ORPO</b></td><td>离线 pair,chosen 需高质量</td><td>不要 · 1 模型</td><td>显存受限、从 base 一步 SFT+对齐</td></tr>
+        <tr><td><b>Best-of-N</b></td><td>RM 给 N=4-64 条候选打分,取最优</td><td>不要 · 1+RM</td><td>最强基线、RFT 迭代造数据</td></tr>
+      </tbody>
+    </table>
+    <div class="k-callout fu" style="--d:.3s"><b>扩展律与基线</b>N=4→256 胜率 +5-8%→+18-22%,边际递减;同预算下 PPO 若打不过 Best-of-N,你的 PPO 有 bug。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="112" y="16">在线 DPO</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="308" y="72">KTO</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="540" y="12">IPO</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="764" y="62">ORPO</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="972" y="66">Best-of-N</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II 对齐</span><span class="pg">p173-180</span></footer>
+</section>

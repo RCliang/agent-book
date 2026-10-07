@@ -1,0 +1,159 @@
+- generic [active] [ref=e1]:
+  - generic: AGENTIC AI · NIGHT CHART
+  - generic: N 31°14′ E 121°29′ · v1.1.0
+  - generic [ref=e4]:
+    - generic:
+      - generic:
+        - generic:
+          - generic: PART II · CH 12
+          - generic: 书 p220-230
+          - generic: GRPO
+          - generic: MCTS
+        - heading "LLM 智能体训练AGENT RL · TRAJECTORY BUFFERS · PARADIGMS" [level=2]
+        - paragraph: 标准 RLHF 只优化单轮应答；自主智能体要跨 10–100+ 次工具调用规划，reward 稀疏且来自真实执行——轨迹缓冲区 e=(S,A,R,S′) 存下整条轨迹，再经三种范式转化为能力。
+      - generic:
+        - generic:
+          - generic:
+            - generic: 01轨迹缓冲区
+            - generic: Token 化文本替代张量：CoT 推理＋结构化工具调用；规模 10³–10⁵ 条，状态 1K–128K token，reward 来自执行环境。
+          - generic:
+            - generic: 02范式 A · 自我纠正
+            - generic: 失败轨迹生成显式文本批评；修正后入最优经验池，以 SFT 或 GRPO 更新权重。代表：STaR·Reflexion。
+          - generic:
+            - generic: 03范式 B · 离策略探索
+            - generic: 自主探索数千条路径；成功过滤·效率排序·多样性采样，只在高质轨迹上算 Loss。代表：ReAct。
+          - generic:
+            - generic: 04范式 C · 经验 RAG
+            - generic: 缓冲区作向量库，Top-k 成功经验注入 Prompt，零训练即时适配；罕见用检索，常见用 RL。
+        - table:
+          - rowgroup:
+            - row "方法 核心思想（一句话） 信号来源":
+              - columnheader "方法"
+              - columnheader "核心思想（一句话）"
+              - columnheader "信号来源"
+          - rowgroup:
+            - row "STaR 迭代 SFT：在自身成功轨迹上自举推理；失败题以正确答案为条件「合理化」，3–5 轮收敛 答案 / 测试正确性":
+              - cell "STaR"
+              - cell "迭代 SFT：在自身成功轨迹上自举推理；失败题以正确答案为条件「合理化」，3–5 轮收敛"
+              - cell "答案 / 测试正确性"
+            - row "Reflexion 上下文 RL：语言式自我批评存入情节记忆（m≤3），零权重更新 评估器二元成败":
+              - cell "Reflexion"
+              - cell "上下文 RL：语言式自我批评存入情节记忆（m≤3），零权重更新"
+              - cell "评估器二元成败"
+            - row "ReAct Prompt 范式：单次生成内交错「思考」与「行动」；格式惩罚写入 reward 环境观测（逐步）":
+              - cell "ReAct"
+              - cell "Prompt 范式：单次生成内交错「思考」与「行动」；格式惩罚写入 reward"
+              - cell "环境观测（逐步）"
+            - row "LATS 树搜索：动作序列上做 MCTS（UCB1）反向传播；WebShop 40%→75% 终端 reward 反向传播":
+              - cell "LATS"
+              - cell "树搜索：动作序列上做 MCTS（UCB1）反向传播；WebShop 40%→75%"
+              - cell "终端 reward 反向传播"
+            - row "AgentQ 离策略 RL：MCTS 产出多样轨迹，按 reward 构造偏好对做 DPO；WebShop 50%→82% 同任务轨迹排序":
+              - cell "AgentQ"
+              - cell "离策略 RL：MCTS 产出多样轨迹，按 reward 构造偏好对做 DPO；WebShop 50%→82%"
+              - cell "同任务轨迹排序"
+            - row "Voyager 技能库：存取已验证代码函数，检索组合复用，终身学习且单调改进 环境执行验证":
+              - cell "Voyager"
+              - cell "技能库：存取已验证代码函数，检索组合复用，终身学习且单调改进"
+              - cell "环境执行验证"
+            - row "RLEF 在线 RL：从执行反馈学习，r=通过测试数/总测试数，零 reward 噪声 测试套件（确定性）":
+              - cell "RLEF"
+              - cell "在线 RL：从执行反馈学习，r=通过测试数/总测试数，零 reward 噪声"
+              - cell "测试套件（确定性）"
+            - row "SWE-Agent / OpenHands GRPO：每组 8–16 轨迹组归一化，解 GitHub Issue（15–50 动作）；SWE-bench 30%→55% 回归测试二元 reward":
+              - cell "SWE-Agent / OpenHands"
+              - cell "GRPO：每组 8–16 轨迹组归一化，解 GitHub Issue（15–50 动作）；SWE-bench 30%→55%"
+              - cell "回归测试二元 reward"
+      - generic:
+        - img:
+          - generic: 缓冲区
+          - generic: 自我纠正
+          - generic: 离策略探索
+          - generic: 经验RAG
+          - generic: GRPO
+      - generic:
+        - generic: 《Agentic AI 指南》中文版 v1.1.0
+        - generic: ·
+        - generic: Part II 强化学习
+        - generic: p220-230
+    - generic [ref=e99]:
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - generic [ref=e102]: PART II · CH 12
+          - generic [ref=e103]: 书 p231-244
+          - generic [ref=e104]: POMDP
+          - generic [ref=e105]: GRPO
+        - heading "案例：副驾与研究 AgentPRODUCTIVITY COPILOT · RESEARCH AGENT" [level=2] [ref=e106]
+        - paragraph [ref=e107]: 同一配方跑通两个用例：SFT 示范打底，模拟环境中 GRPO 在线强化，执行 reward 与人类反馈共同塑形——生产力副驾与研究 Agent。
+      - generic [ref=e108]:
+        - list [ref=e109]:
+          - listitem [ref=e110]: SFT：50K–200K 示范轨迹
+          - listitem [ref=e111]: →构建模拟沙盒 · 任务课程
+          - listitem [ref=e112]: →GRPO 在线 RL（N=8/任务）
+          - listitem [ref=e113]: →内测 1000+ 用户 · DPO 精调
+        - generic [ref=e114]:
+          - generic [ref=e115]:
+            - generic [ref=e116]: 01POMDP 形式化
+            - generic [ref=e117]: 动作=六应用 JSON API 调用；状态=工作区投影（部分可观测）；γ=0.99 · 10–50 步。
+          - generic [ref=e118]:
+            - generic [ref=e119]: 02多目标 Reward
+            - generic [ref=e120]: 任务 .40·质量 .25·效率 .15·安全 .15·用户 .05；违规则安全项归零。
+          - generic [ref=e121]:
+            - generic [ref=e122]: 03模拟环境与课程
+            - generic [ref=e123]: 沙盒合成邮箱·日历·文档；L1 单步→L5 跨应用，成功率 >70% 晋级。
+          - generic [ref=e124]:
+            - generic [ref=e125]: 04安全护栏 · 信用分配
+            - generic [ref=e126]: 硬约束（外发·删除·改权限）拒并 −1.0；子目标各 +0.2，失败只罚断裂段。
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - img "生产力副驾架构：用户、副驾策略与六应用 API，执行 reward 经 GRPO 回流更新策略" [ref=e129]:
+              - generic [ref=e130]:
+                - generic [ref=e132]: 用户
+                - generic [ref=e133]: 意图 · 反馈
+              - generic [ref=e134]:
+                - generic [ref=e136]: 副驾 Copilot
+                - generic [ref=e137]: RL 策略 πθ · LLM
+                - generic [ref=e138]: 思考 CoT + JSON 工具调用
+                - generic [ref=e139]: γ=0.99 · 视野 10–50 步
+              - generic [ref=e140]:
+                - generic [ref=e142]: 生产力应用 API
+                - generic [ref=e144]: Outlook · 邮件
+                - generic [ref=e146]: Excel · 表格
+                - generic [ref=e148]: Word · 文档
+                - generic [ref=e150]: PowerPoint · 幻灯
+                - generic [ref=e152]: Teams · 消息
+                - generic [ref=e154]: SharePoint · 存储
+              - generic [ref=e156]: 意图
+              - generic [ref=e158]: 预览 · 结果
+              - generic [ref=e160]: JSON 动作
+              - generic [ref=e162]: 观测 · 截断
+              - generic [ref=e165]: Reward：任务·质量·效率·安全·用户反馈
+              - generic [ref=e166]: GRPO 组归一化（每任务 N=8）更新 πθ
+              - generic [ref=e167]: 训练于模拟沙盒：合成邮箱·日历·文档
+            - generic [ref=e168]: 图 12.2 · 生产力副驾（用例一）：用户意图 → 策略 πθ → 六应用 API；执行 reward 经 GRPO 回流，端到端更新策略
+          - generic [ref=e169]:
+            - generic [ref=e170]:
+              - generic [ref=e171]: 05用例二 · 研究 Agent
+              - generic [ref=e172]: GRPO N=4·γ=1.0；R=质量 .30＋正确 .30＋新颖 .15＋效率 .15＋格式 .10。示例：13 步实验 R=0.875，优势 +1.48。
+            - generic [ref=e173]:
+              - generic [ref=e174]: 06失败模式与教训
+              - generic [ref=e175]: 无限循环·调试螺旋·幻觉引用·过早提交·judge hacking；对策：步数预算、重试上限 3、引用验证、轮换 judge。
+      - img [ref=e177]:
+        - generic [ref=e179]: SFT 起步
+        - generic [ref=e182]: 模拟沙盒
+        - generic [ref=e185]: GRPO
+        - generic [ref=e188]: 安全护栏
+        - generic [ref=e191]: 研究Agent
+      - generic [ref=e194]:
+        - generic [ref=e195]: 《Agentic AI 指南》中文版 v1.1.0
+        - generic [ref=e196]: ·
+        - generic [ref=e197]: Part II 强化学习
+        - generic [ref=e198]: p231-244
+  - generic [ref=e90]: PART II · CH 12 · 案例：副驾与研究 Agent
+  - generic [ref=e91]: ← → 翻页 · T 目录 · F 全屏
+  - generic [ref=e92]:
+    - generic [ref=e93]: 02 / 02
+    - generic [ref=e94] [cursor=pointer]: 目录
+    - generic [ref=e95] [cursor=pointer]: 全屏
+  - generic [aria-hidden] [ref=e97] [cursor=pointer]
+  - generic [aria-hidden] [ref=e98] [cursor=pointer]

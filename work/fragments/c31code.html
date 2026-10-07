@@ -1,0 +1,49 @@
+<!-- ▸ c31code · 代码实战:LangGraph 生产级研究 Agent -->
+<section class="slide" id="c31code" data-part="5" data-crumb="PART V · 代码 26" data-title="LangGraph 研究 Agent">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 26.26 · 书 p490-491</span><span class="tag c">Python</span><span class="tag c">langgraph</span></div>
+    <h2 class="k-h">LangGraph 生产级研究 Agent<span class="en">GRAPH AS CONTROL FLOW · STATE · CHECKPOINT</span></h2>
+    <p class="k-lede">书 26.9:研究 Agent 的推理/检索/审阅被编译成图——节点是函数、State 是唯一载体、条件边画出自批评回路,checkpoint 负责可恢复。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">class</span> <span class="f">ResearchState</span>(<span class="f">TypedDict</span>):
+    messages: <span class="f">Annotated</span>[<span class="f">List</span>[<span class="f">BaseMessage</span>], add_messages]  <span class="c">① 节点间只传 State</span>
+    error_count: <span class="k">int</span>
+    tool_call_count: <span class="k">int</span>
+    status: <span class="f">Literal</span>[<span class="s">"researching"</span>, <span class="s">"done"</span>, <span class="s">"failed"</span>]
+<span class="k">def</span> <span class="f">route_after_llm</span>(state: <span class="f">ResearchState</span>) -&gt; <span class="k">str</span>:          <span class="c">② 条件边路由</span>
+    <span class="k">if</span> state[<span class="s">"error_count"</span>] &gt;= 5 <span class="k">or</span> state[<span class="s">"tool_call_count"</span>] &gt;= 15:
+        <span class="k">return</span> <span class="s">"fail"</span>                                <span class="c">预算熔断</span>
+    last_message = state[<span class="s">"messages"</span>][-1]
+    <span class="k">if</span> <span class="f">hasattr</span>(last_message, <span class="s">"tool_calls"</span>) <span class="k">and</span> last_message.tool_calls:
+        <span class="k">return</span> <span class="s">"tools"</span>
+    <span class="k">return</span> <span class="s">"research"</span>   <span class="c">无工具调用 → LLM 继续推理</span>
+<span class="k">async def</span> <span class="f">build_graph</span>(db_url: <span class="k">str</span>) -&gt; <span class="f">CompiledStateGraph</span>:  <span class="c">③ 图即控制流</span>
+    checkpointer = <span class="f">AsyncPostgresSaver</span>.<span class="f">from_conn_string</span>(db_url)  <span class="c">④ 检查点</span>
+    builder = <span class="f">StateGraph</span>(<span class="f">ResearchState</span>)
+    <span class="k">...</span>  <span class="c"># add_node ×4;START→research;tools→check;fail→END(略)</span>
+    builder.<span class="f">add_conditional_edges</span>(<span class="s">"research"</span>, route_after_llm,
+        {<span class="s">"tools"</span>: <span class="s">"tools"</span>, <span class="s">"research"</span>: <span class="s">"research"</span>, <span class="s">"fail"</span>: <span class="s">"fail"</span>})
+    builder.<span class="f">add_conditional_edges</span>(<span class="s">"check"</span>,
+        <span class="k">lambda</span> s: <span class="s">"end"</span> <span class="k">if</span> s[<span class="s">"status"</span>] == <span class="s">"done"</span> <span class="k">else</span> <span class="s">"research"</span>,
+        {<span class="s">"end"</span>: END, <span class="s">"research"</span>: <span class="s">"research"</span>})   <span class="c">审阅未过 → 打回重做</span>
+    <span class="k">return</span> builder.<span class="f">compile</span>(checkpointer=checkpointer)</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①</span>State 是唯一传参</div><div class="k-card-b">节点返回 dict,由图合并进 State 再传下一节点;messages 挂 add_messages reducer,追加不覆盖。完整 State 另有 topic / sources_* / report_id。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">②</span>条件边 = 自批评回路</div><div class="k-card-b">有 tool_calls 去 tools,否则回 research 继续想;错误经 AIMessage 回灌给 LLM 调整策略;error≥5 或 tool_call≥15 熔断——预算上限写进图里。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">③</span>图即控制流</div><div class="k-card-b">节点是函数、边是转移,compile 后成可执行图;check 审阅产出,未 done 就打回 research——循环由图拓扑表达,不是「请反复思考」一句提示词。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">④</span>checkpoint 可恢复</div><div class="k-card-b">AsyncPostgresSaver 每步落库,进程崩溃后从任意检查点续跑;长任务的断点续传全靠它——这是生产级与研究原型的分水岭。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>依赖 langgraph · langchain-openai · tenacity · asyncpg;graph = await build_graph(PG_URL) 后 ainvoke 传入研究主题;预期:多轮 search_web / fetch_document 后 save_report 恰好落库一次,status→done。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="126" y="16">State 流转</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="362" y="70">条件边路由</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="608" y="14">审阅回路</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="840" y="64">PG 检查点</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p490-491</span></footer>
+</section>

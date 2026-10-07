@@ -1,0 +1,55 @@
+<!-- ▸ c11b · DPO 陷阱与变体家族 -->
+<section class="slide" id="c11b" data-part="2" data-crumb="PART II · CH 06" data-title="DPO 陷阱与变体家族">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 06</span><span class="dim">书 p148-157</span><span class="tag c">β 指南</span><span class="tag c">8 变体</span></div>
+    <h2 class="k-h">DPO 陷阱与变体家族<span class="en">PITFALLS · BETA GUIDE · VARIANT FAMILY</span></h2>
+    <p class="k-lede">DPO 简单但陷阱密布:不掩码的 prompt、均值代求和、过期的 reference 都会静默失败;八个变体针对各自的失败场景对症下药。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>0.05</b><span>激进 · 数据好,要明显改进</span></div>
+      <div class="k-num v"><b>0.1</b><span>标准 · 默认起点,质量稳定性平衡</span></div>
+      <div class="k-num c"><b>0.2</b><span>保守 · 噪声多或已近期望行为</span></div>
+      <div class="k-num"><b>0.5</b><span>非常保守 · 安全微调,保住能力</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>陷阱 · 忘记掩码 prompt</div>
+          <div class="k-card-b">prompt token 混入求和 → 优化「prompt 似然」(<b>无意义</b>),有效 β 也算错。</div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>陷阱 · 均值代求和</div>
+          <div class="k-card-b">长回答对数概率天然更低;<span class="cy">均值与求和</span>隐式长度惩罚不同,πθ 与 π_ref 必须一致。</div>
+        </div>
+        <div class="k-card fu" style="--d:.22s">
+          <div class="k-card-t"><span class="no">03</span>陷阱 · reference 过强/过弱</div>
+          <div class="k-card-b">base 对微调模型相距过远 → KL 主导、梯度消失,应改用 <b>SFT checkpoint</b>;过强 policy 动弹不得,过弱失去正则化。</div>
+        </div>
+      </div>
+      <table class="k-table fu" style="--d:.2s">
+        <thead><tr><th>变体</th><th>核心改动</th><th>解决的失败场景</th></tr></thead>
+        <tbody>
+          <tr><td><b>f-DPO</b></td><td>f′ 替换对数比,推广 f-散度</td><td>反向 KL 寻峰,多样性差</td></tr>
+          <tr><td><b>Robust DPO</b></td><td>(1−ε)L(w,l)−εL(l,w) 除以 1−2ε</td><td>标签噪声、标注翻转</td></tr>
+          <tr><td><b>TR-DPO</b></td><td>EMA 周期更新 reference,α 混入 policy</td><td>reference 过期,KL 主导早平台</td></tr>
+          <tr><td><b>EXO</b></td><td>对调 πθ 与 π_ref 角色,纠正反向 KL</td><td>loss 实为前向 KL,方向错</td></tr>
+          <tr><td><b>NCA</b></td><td>加绝对似然项,防被选概率同跌</td><td>似然崩塌:被选也被压低</td></tr>
+          <tr><td><b>SLiC-HF</b></td><td>hinge 损失 max(0, δ−margin)</td><td>大 margin 时 log-sigmoid 收敛慢</td></tr>
+          <tr><td><b>Iterative RPO</b></td><td>被选上加 NLL:λ1·L_DPO+λ2·L_NLL</td><td>会判别不会生成,推理退化</td></tr>
+          <tr><td><b>SimPO</b></td><td>免 reference:β/|y|·log πθ + margin γ</td><td>reference 显存翻倍、复杂</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="k-callout fu" style="--d:.3s"><b>驱逐 reference</b>π_ref 全程静止:预计算 reference 对数概率、缓存磁盘后逐出 → 显存腾出,B_micro 1-2→4-8,70B 约省 <b>140GB</b>。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="120" y="16">常见陷阱</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">β 选择</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="528" y="12">预计算 ref</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="755" y="62">变体家族</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="982" y="66">免 ref SimPO</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II</span><span class="pg">p148-157</span></footer>
+</section>

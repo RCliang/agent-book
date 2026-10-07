@@ -1,0 +1,72 @@
+<!-- ▸ c32a · Agentic UI 框架:范式与组件(书 p495-502) -->
+<section class="slide" id="c32a" data-part="5" data-crumb="PART V · CH 27" data-title="Agentic UI:范式与组件">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 27</span><span class="dim">书 p495-502</span><span class="tag c">范式光谱</span><span class="tag c">框架对比</span></div>
+    <h2 class="k-h">Agentic UI 框架<span class="en">PARADIGMS · COMPONENTS · FRAMEWORKS</span></h2>
+    <p class="k-lede">聊天气泡只传达结果,Agent 界面必须传达过程——推理、工具与决策。六大范式沿「对话 → 自主」光谱展开,配套七大关键组件与快速成熟的框架生态。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.08s">
+          <div class="k-card-t"><span class="no">01</span>超越聊天框</div>
+          <div class="k-card-b">聊天传达结果,Agent UI 传达过程:推理、工具来源、决策点与撤销路径——主动对抗自动化偏差(automation bias)。</div>
+        </div>
+        <div class="k-card fu" style="--d:.16s">
+          <div class="k-card-t"><span class="no">02</span>七大关键组件</div>
+          <div class="k-card-b">思考展示·工具可视化·进度·审批门控·上下文·错误恢复·置信度;设计目标:透明·可控·信任校准·效率·可恢复。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 260" role="img" aria-label="Agent UI 六大范式光谱:从聊天对话到带检查点的自主模式">
+          <rect x="60" y="96" width="740" height="72" fill="rgba(78,201,212,.05)"/>
+          <rect x="590" y="96" width="210" height="72" fill="rgba(255,82,56,.05)"/>
+          <text class="m" x="60" y="40" style="letter-spacing:.2em" fill="var(--faint)">人类介入深</text>
+          <text class="m" x="800" y="40" text-anchor="end" style="letter-spacing:.2em" fill="var(--faint)">自主性高</text>
+          <line class="draw" style="--d:.25s" pathLength="1" x1="60" y1="132" x2="784" y2="132" stroke="var(--cyan)" stroke-width="2"/>
+          <polygon points="800,132 784,125 784,139" fill="var(--cyan)"/>
+          <circle class="pop" style="--d:.45s" cx="110" cy="132" r="6" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <text x="110" y="108" text-anchor="middle" style="font-size:14px;font-weight:700">聊天对话</text>
+          <text class="mut" x="110" y="156" text-anchor="middle" style="font-size:12px">流式响应 + 内联工具徽章</text>
+          <circle class="pop" style="--d:.65s" cx="230" cy="132" r="5.5" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="230" y="108" text-anchor="middle" style="font-size:14px;font-weight:700">画布产物</text>
+          <text class="mut" x="230" y="178" text-anchor="middle" style="font-size:12px">Claude Artifacts · Canvas</text>
+          <circle cx="350" cy="132" r="5.5" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="350" y="108" text-anchor="middle" style="font-size:14px;font-weight:700">协作界面</text>
+          <text class="mut" x="350" y="156" text-anchor="middle" style="font-size:12px">Cursor · Notion AI</text>
+          <circle class="pop" style="--d:.85s" cx="470" cy="132" r="5.5" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="470" y="108" text-anchor="middle" style="font-size:14px;font-weight:700">工作流可视化</text>
+          <text class="mut" x="470" y="178" text-anchor="middle" style="font-size:12px">LangGraph Studio</text>
+          <circle class="pop" style="--d:1.05s" cx="590" cy="132" r="5.5" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="590" y="108" text-anchor="middle" style="font-size:14px;font-weight:700">仪表盘监控</text>
+          <text class="mut" x="590" y="156" text-anchor="middle" style="font-size:12px">Grafana · Streamlit</text>
+          <circle class="pop" style="--d:1.25s" cx="710" cy="132" r="6" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <circle cx="710" cy="132" r="12" fill="none" stroke="var(--amber)" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="710" y="108" text-anchor="middle" style="font-size:14px;font-weight:700">自主·检查点</text>
+          <text class="mut" x="710" y="178" text-anchor="middle" style="font-size:12px">Computer Use · Operator</text>
+        </svg>
+        <div class="figcap">图 27.1 · Agent UI 范式光谱:虚线环 = 不可逆操作前的批准检查点;按任务时长、介入程度与输出类型选择,常组合多种范式</div>
+      </div>
+    </div>
+    <div class="fu" style="--d:.3s">
+      <table class="k-table">
+        <thead><tr><th>框架</th><th>语言</th><th>生成式 UI</th><th>定位与亮点</th></tr></thead>
+        <tbody>
+          <tr><td>Vercel AI SDK</td><td>TypeScript</td><td>✓</td><td>useChat 等流式 Hook + RSC 组件流,生产级 Web Agent UI 应用最广</td></tr>
+          <tr><td>Chainlit</td><td>Python</td><td>部分</td><td>LangChain / LlamaIndex 步骤自动渲染为可折叠树,内置认证与反馈采集</td></tr>
+          <tr><td>Gradio</td><td>Python</td><td>◦</td><td>ChatInterface 极少代码原型,Hugging Face Spaces 零配置分享</td></tr>
+          <tr><td>Streamlit</td><td>Python</td><td>×</td><td>st.metric 仪表盘 + st.write_stream 流式,@st.fragment 局部重跑</td></tr>
+          <tr><td>LangGraph Studio</td><td>Python/TS</td><td>×</td><td>桌面可视化 IDE:状态检查、时间旅行调试、任意节点人机协同断点</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 320,72 480,44 S800,12 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="34" r="4.5"/><text x="136" y="21">聊天之限</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="384" cy="52" r="4.5"/><text x="360" y="72">范式光谱</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="626" cy="24" r="4.5"/><text x="602" y="12">七大组件</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="1000" cy="32" r="4.5"/><text x="976" y="18">框架生态</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V</span><span class="pg">p495-502</span></footer>
+</section>

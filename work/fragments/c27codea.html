@@ -1,0 +1,50 @@
+<!-- ▸ c27codea · 代码实战:MCP Server(FastMCP) -->
+<section class="slide codeslide" id="c27codea" data-part="5" data-crumb="PART V · 代码 22" data-title="MCP Server:FastMCP">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 22.1 · 书 p406-407</span><span class="tag c">Python</span><span class="tag c">mcp[cli]</span></div>
+    <h2 class="k-h">用 FastMCP 写一个 MCP Server<span class="en">DECLARATIVE TOOLS · AUTO SCHEMA · AUTO TRANSPORT</span></h2>
+    <p class="k-lede">书 22.7.1 的完整记笔记 server:装饰器声明 tool 与 resource,Schema 与传输全自动——这就是「N×M 集成问题」的标准答案长什么样。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">from</span> pathlib <span class="k">import</span> Path
+<span class="k">from</span> mcp.server.fastmcp <span class="k">import</span> FastMCP
+
+mcp = <span class="f">FastMCP</span>(<span class="s">"notes-server"</span>)          <span class="c">① 一个实例=一个 server</span>
+NOTES_DIR = Path.home() / <span class="s">".notes"</span>
+
+<span class="k">@mcp.tool()</span>                               <span class="c">② 声明式 tool</span>
+<span class="k">def</span> <span class="f">create_note</span>(title: <span class="k">str</span>, content: <span class="k">str</span>,
+                tags: <span class="k">list</span>[<span class="k">str</span>] | <span class="k">None</span> = <span class="k">None</span>) -&gt; <span class="k">str</span>:
+    <span class="s">"""Create a new text note. Use this when
+    the user wants to save information."""</span>  <span class="c">③ docstring 给 LLM 看</span>
+    safe = <span class="s">""</span>.join(c <span class="k">if</span> c.isalnum() <span class="k">or</span> c <span class="k">in</span> <span class="s">"-_"</span> <span class="k">else</span> <span class="s">"_"</span>
+                   <span class="k">for</span> c <span class="k">in</span> title).strip()  <span class="c">④ 输入校验:防路径穿越</span>
+    p = NOTES_DIR / <span class="s">f"</span>{safe}<span class="s">.md"</span>
+    p.write_text(<span class="s">f"---\ntitle: </span>{title}<span class="s">\n---\n\n"</span> + content,
+                 encoding=<span class="s">"utf-8"</span>)
+    <span class="k">return</span> <span class="s">f"Note saved to </span>{p}<span class="s">"</span>
+<span class="k">@mcp.resource</span>(<span class="s">"notes://{title}"</span>)        <span class="c">⑤ URI 路由的只读数据</span>
+<span class="k">def</span> <span class="f">get_note</span>(title: <span class="k">str</span>) -&gt; <span class="k">str</span>:
+    <span class="k">return</span> (NOTES_DIR / <span class="s">f"</span>{title}<span class="s">.md"</span>).read_text(<span class="s">"utf-8"</span>)
+
+<span class="k">if</span> __name__ == <span class="s">"__main__"</span>:
+    mcp.run()  <span class="c">⑥ stdio / Streamable HTTP 自动选择</span></pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①②</span>声明式,免手写 Schema</div><div class="k-card-b">@mcp.tool() 从 Python 类型注解 + docstring 自动推断 JSON Schema——相比低层 API 省掉整个 inputSchema 手写环节。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">③</span>docstring 是 prompt 的一部分</div><div class="k-card-b">模型靠它决定「何时调用」。写清「何时用」比写清「怎么做」更重要——这是工具描述工程的最小单元。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">④⑤</span>校验在 server,数据与动作分离</div><div class="k-card-b">路径穿越是 tool 的头号注入面,文件名清洗是底线;resource 是只读「数据」,tool 是带副作用的「动作」。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">⑥</span>传输对上层透明</div><div class="k-card-b">本地子进程走 stdio,远程走 Streamable HTTP——同一份代码两种部署,Client 不需要改动。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>pip install "mcp[cli]" · 启动:mcp run notes_server.py(stdio)或 --transport streamable-http;预期:server 就绪等待 Client 握手。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="132" y="16">FastMCP 实例</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="368" y="70">@tool 自动 Schema</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="604" y="14">输入校验</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="842" y="64">resource 路由</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p406-407</span></footer>
+</section>

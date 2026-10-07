@@ -1,0 +1,107 @@
+<!-- ▸ c14 · 奖励模型训练(书 p181-188) -->
+<section class="slide" id="c14" data-part="2" data-crumb="PART II · CH 09" data-title="奖励模型训练">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 09</span><span class="dim">书 p181-188</span><span class="tag c">Bradley-Terry</span><span class="tag c">PRM/ORM</span><span class="tag c">RLVR</span></div>
+    <h2 class="k-h">奖励模型训练<span class="en">BRADLEY-TERRY · PRM VS ORM · RLVR · LISTWISE</span></h2>
+    <p class="k-lede">奖励模型把人类偏好变成 RL 训练信号,训练不佳就是<b>奖励黑客</b>的源头:BT 成对推导定框架,PRM 逐步打分补稀疏,RLVR 用规则防作弊,PL 列表排序补校准。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>1</b><span>标量回归头(num_labels=1)换下 LM 头</span></div>
+      <div class="k-num v"><b>0.01</b><span>center_rewards_coefficient 奖励中心化</span></div>
+      <div class="k-num c"><b>K=4-8</b><span>listwise 训练常用列表长度</span></div>
+      <div class="k-num"><b>κ &gt; 0.6</b><span>标注者一致性,质量过滤阈值</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>Bradley-Terry 推导</div>
+          <div class="k-card-b">P(y_w≻y_l)=σ(r_w−r_l);MLE 即二元交叉熵,「正类」=偏好回答。前提:传递性·标量奖励·仅依赖分差·成对独立。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>架构与训练技巧</div>
+          <div class="k-card-b">LM 头换标量回归头,末 token/[CLS] 池化。奖励中心化稳训练,margin m 保间隔;长度归一化·受控训练·校准治长度偏置。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">03</span>RLVR 与多目标组合</div>
+          <div class="k-card-b">数学/代码/格式用确定性规则,显著减少 reward hacking(DeepSeek-R1);组合:加权求和、先归一化再求和(GDPO)、字典序。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 336" role="img" aria-label="ORM 与 PRM 对比:ORM 只对最终答案打一个分,PRM 对每一步推理逐步打分">
+          <defs>
+            <marker id="arwC14" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--cyan)"/></marker>
+            <marker id="arwV14" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--verm)"/></marker>
+          </defs>
+          <!-- ORM 行 -->
+          <text x="36" y="24" style="font-weight:700">ORM · 结果奖励</text>
+          <text class="mut" x="168" y="24">Outcome Reward · 只看最终答案</text>
+          <rect x="36" y="36" width="76" height="32" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text class="m" x="74" y="56" text-anchor="middle">prompt</text>
+          <line x1="114" y1="52" x2="131" y2="52" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="136" y="36" width="88" height="32" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="180" y="56" text-anchor="middle">步骤 1</text>
+          <line x1="226" y1="52" x2="236" y2="52" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="240" y="36" width="88" height="32" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="284" y="56" text-anchor="middle">步骤 2</text>
+          <line x1="330" y1="52" x2="340" y2="52" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="344" y="36" width="88" height="32" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="388" y="56" text-anchor="middle">步骤 3</text>
+          <line x1="434" y1="52" x2="455" y2="52" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="460" y="36" width="100" height="32" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text x="510" y="56" text-anchor="middle">最终答案</text>
+          <line x1="562" y1="52" x2="587" y2="52" stroke="var(--verm)" stroke-width="1.5" marker-end="url(#arwV14)"/>
+          <rect class="pop" style="--d:.55s" x="592" y="36" width="140" height="32" rx="6" fill="var(--verm-bg)" stroke="var(--verm)"/>
+          <text class="m" x="662" y="56" text-anchor="middle" fill="var(--verm)">r ∈ {0, 1}</text>
+          <path d="M136,82 L136,90 L732,90 L732,82" fill="none" stroke="rgba(255,82,56,.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <text class="mut" x="136" y="110">整条链只有 1 个信号:稀疏 · 信用分配难 · 较易被 reward hacking · 标注成本低</text>
+          <line x1="36" y1="126" x2="824" y2="126" stroke="var(--line)" stroke-width="1.5"/>
+          <!-- PRM 行 -->
+          <text x="36" y="150" style="font-weight:700">PRM · 过程奖励</text>
+          <text class="mut" x="612" y="150">Process Reward · 每步都打分</text>
+          <rect x="36" y="162" width="76" height="32" rx="6" fill="var(--ink2)" stroke="var(--line)"/>
+          <text class="m" x="74" y="182" text-anchor="middle">prompt</text>
+          <line x1="114" y1="178" x2="131" y2="178" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="136" y="162" width="88" height="32" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)"/>
+          <text x="180" y="182" text-anchor="middle">步骤 1</text>
+          <line x1="226" y1="178" x2="236" y2="178" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="240" y="162" width="88" height="32" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)"/>
+          <text x="284" y="182" text-anchor="middle">步骤 2</text>
+          <line x1="330" y1="178" x2="340" y2="178" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="344" y="162" width="88" height="32" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)"/>
+          <text x="388" y="182" text-anchor="middle">步骤 3</text>
+          <line x1="434" y1="178" x2="455" y2="178" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="460" y="162" width="100" height="32" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.4)"/>
+          <text x="510" y="182" text-anchor="middle">最终答案</text>
+          <line x1="562" y1="178" x2="587" y2="178" stroke="var(--cyan)" stroke-width="1.5" marker-end="url(#arwC14)"/>
+          <rect x="592" y="162" width="140" height="32" rx="6" fill="var(--cyan-bg)" stroke="var(--cyan)"/>
+          <text class="m" x="662" y="182" text-anchor="middle" fill="var(--cyan)">r₁ r₂ r₃ …</text>
+          <g class="pop" style="--d:.9s"><circle cx="180" cy="146" r="12" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/><text class="m" x="180" y="150" text-anchor="middle" style="font-size:10px" fill="var(--amber)">0.9</text></g>
+          <g class="pop" style="--d:1.05s"><circle cx="284" cy="146" r="12" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/><text class="m" x="284" y="150" text-anchor="middle" style="font-size:10px" fill="var(--amber)">0.7</text></g>
+          <g class="pop" style="--d:1.2s"><circle cx="388" cy="146" r="12" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/><text class="m" x="388" y="150" text-anchor="middle" style="font-size:10px" fill="var(--amber)">0.4</text></g>
+          <g class="pop" style="--d:1.35s"><circle cx="510" cy="146" r="12" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/><text class="m" x="510" y="150" text-anchor="middle" style="font-size:10px" fill="var(--amber)">1.0</text></g>
+          <text class="mut" x="36" y="224">逐步增量信号:稠密信用分配 · 较难被攻击 · 标注贵——蒙特卡洛 rollout / LLM-as-judge / 形式验证器</text>
+          <text class="m" x="36" y="252" fill="var(--amber)">PBRS</text>
+          <text class="mut" x="88" y="252">势函数 Φ(s)= 部分得分塑形奖励,理论上保留最优策略</text>
+          <rect x="36" y="270" width="380" height="42" rx="6" fill="var(--verm-bg)" stroke="rgba(255,82,56,.35)"/>
+          <text x="52" y="288" style="font-weight:700">ORM 适合简单任务</text>
+          <text class="mut" x="52" y="304">情感 / 毒性 / 事实性——成本低,已经够用</text>
+          <rect x="444" y="270" width="380" height="42" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text x="460" y="288" style="font-weight:700">PRM 适合多步推理</text>
+          <text class="mut" x="460" y="304">数学 / 代码 / 逻辑,还可作 beam search 步骤分</text>
+        </svg>
+        <div class="figcap">图 9.1 · ORM 只在链尾给一个 0/1 信号;PRM 逐步打分,信用分配稠密但标注成本高</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>Listwise 排序</b>Plackett-Luce 是 BT 的严格推广(K=2 退化回 BT);一次排序含 C(K,2) 个隐式对、学到绝对尺度,与 GRPO 分组天然契合。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">BT 模型</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="302" y="72">RM 架构</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="524" y="12">PRM/ORM</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="764" y="62">RLVR</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="970" y="66">Listwise</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II 对齐</span><span class="pg">p181-188</span></footer>
+</section>

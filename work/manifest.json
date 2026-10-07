@@ -1,0 +1,352 @@
+[
+ {
+  "no": 1,
+  "file": "ch01.txt",
+  "title": "免责声明",
+  "part": null,
+  "start": 25,
+  "end": 25,
+  "pages": 1,
+  "chars": 1023
+ },
+ {
+  "no": 2,
+  "file": "ch02.txt",
+  "title": "关于作者",
+  "part": null,
+  "start": 26,
+  "end": 26,
+  "pages": 1,
+  "chars": 295
+ },
+ {
+  "no": 3,
+  "file": "ch03.txt",
+  "title": "前言",
+  "part": null,
+  "start": 27,
+  "end": 31,
+  "pages": 5,
+  "chars": 6078
+ },
+ {
+  "no": 4,
+  "file": "ch04.txt",
+  "title": "引言",
+  "part": null,
+  "start": 32,
+  "end": 35,
+  "pages": 4,
+  "chars": 4795
+ },
+ {
+  "no": 5,
+  "file": "ch05.txt",
+  "title": "缩略语表",
+  "part": null,
+  "start": 36,
+  "end": 37,
+  "pages": 2,
+  "chars": 3535
+ },
+ {
+  "no": 6,
+  "file": "ch06.txt",
+  "title": "LLM 架构与优化方法",
+  "part": "I 基础",
+  "start": 39,
+  "end": 106,
+  "pages": 68,
+  "chars": 82434
+ },
+ {
+  "no": 7,
+  "file": "ch07.txt",
+  "title": "面向 LLM 的系统基础",
+  "part": "I 基础",
+  "start": 107,
+  "end": 120,
+  "pages": 14,
+  "chars": 18035
+ },
+ {
+  "no": 8,
+  "file": "ch08.txt",
+  "title": "强化学习导论",
+  "part": "I 基础",
+  "start": 121,
+  "end": 132,
+  "pages": 12,
+  "chars": 12955
+ },
+ {
+  "no": 9,
+  "file": "ch09.txt",
+  "title": "大语言模型的强化学习基础",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 134,
+  "end": 136,
+  "pages": 3,
+  "chars": 3542
+ },
+ {
+  "no": 10,
+  "file": "ch10.txt",
+  "title": "PPO——近端策略优化",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 137,
+  "end": 144,
+  "pages": 8,
+  "chars": 10861
+ },
+ {
+  "no": 11,
+  "file": "ch11.txt",
+  "title": "DPO——直接偏好优化",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 145,
+  "end": 157,
+  "pages": 13,
+  "chars": 16410
+ },
+ {
+  "no": 12,
+  "file": "ch12.txt",
+  "title": "GRPO —— 组相对策略优化",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 158,
+  "end": 172,
+  "pages": 15,
+  "chars": 20144
+ },
+ {
+  "no": 13,
+  "file": "ch13.txt",
+  "title": "偏好优化变体",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 173,
+  "end": 180,
+  "pages": 8,
+  "chars": 9633
+ },
+ {
+  "no": 14,
+  "file": "ch14.txt",
+  "title": "奖励模型训练",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 181,
+  "end": 188,
+  "pages": 8,
+  "chars": 8868
+ },
+ {
+  "no": 15,
+  "file": "ch15.txt",
+  "title": "SFT 最佳实践与技巧",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 189,
+  "end": 196,
+  "pages": 8,
+  "chars": 9485
+ },
+ {
+  "no": 16,
+  "file": "ch16.txt",
+  "title": "大规模系统架构与基础设施",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 197,
+  "end": 219,
+  "pages": 23,
+  "chars": 28041
+ },
+ {
+  "no": 17,
+  "file": "ch17.txt",
+  "title": "LLM 智能体训练",
+  "part": "II 面向大语言模型的强化学习方法",
+  "start": 220,
+  "end": 247,
+  "pages": 28,
+  "chars": 37543
+ },
+ {
+  "no": 18,
+  "file": "ch18.txt",
+  "title": "面向大型推理模型的强化学习",
+  "part": "III 推理",
+  "start": 249,
+  "end": 272,
+  "pages": 24,
+  "chars": 28534
+ },
+ {
+  "no": 19,
+  "file": "ch19.txt",
+  "title": "LLM 评估",
+  "part": "IV 评估",
+  "start": 274,
+  "end": 288,
+  "pages": 15,
+  "chars": 17985
+ },
+ {
+  "no": 20,
+  "file": "ch20.txt",
+  "title": "智能体 AI 简介",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 290,
+  "end": 292,
+  "pages": 3,
+  "chars": 3248
+ },
+ {
+  "no": 21,
+  "file": "ch21.txt",
+  "title": "检索增强生成（RAG）",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 293,
+  "end": 315,
+  "pages": 23,
+  "chars": 30837
+ },
+ {
+  "no": 22,
+  "file": "ch22.txt",
+  "title": "智能体记忆系统",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 316,
+  "end": 340,
+  "pages": 25,
+  "chars": 36113
+ },
+ {
+  "no": 23,
+  "file": "ch23.txt",
+  "title": "Agent Harness —— 上下文管理与编排",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 341,
+  "end": 364,
+  "pages": 24,
+  "chars": 32276
+ },
+ {
+  "no": 24,
+  "file": "ch24.txt",
+  "title": "循环工程（Loop Engineering）",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 365,
+  "end": 377,
+  "pages": 13,
+  "chars": 15771
+ },
+ {
+  "no": 25,
+  "file": "ch25.txt",
+  "title": "Agent 设计模式",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 378,
+  "end": 382,
+  "pages": 5,
+  "chars": 5749
+ },
+ {
+  "no": 26,
+  "file": "ch26.txt",
+  "title": "Agent 环境与基准",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 383,
+  "end": 397,
+  "pages": 15,
+  "chars": 22637
+ },
+ {
+  "no": 27,
+  "file": "ch27.txt",
+  "title": "模型上下文协议（Model Context Protocol, MCP）",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 398,
+  "end": 416,
+  "pages": 19,
+  "chars": 25414
+ },
+ {
+  "no": 28,
+  "file": "ch28.txt",
+  "title": "Agent Skills",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 417,
+  "end": 421,
+  "pages": 5,
+  "chars": 5204
+ },
+ {
+  "no": 29,
+  "file": "ch29.txt",
+  "title": "智能体到智能体通信（Agent-to-Agent, A2A）",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 422,
+  "end": 442,
+  "pages": 21,
+  "chars": 31999
+ },
+ {
+  "no": 30,
+  "file": "ch30.txt",
+  "title": "多智能体系统（Multi-Agent Systems）",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 443,
+  "end": 462,
+  "pages": 20,
+  "chars": 26039
+ },
+ {
+  "no": 31,
+  "file": "ch31.txt",
+  "title": "Agent 开发框架",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 463,
+  "end": 494,
+  "pages": 32,
+  "chars": 53639
+ },
+ {
+  "no": 32,
+  "file": "ch32.txt",
+  "title": "Agentic UI 框架",
+  "part": "V 智能体 AI（Agentic AI）",
+  "start": 495,
+  "end": 514,
+  "pages": 20,
+  "chars": 30236
+ },
+ {
+  "no": 33,
+  "file": "ch33.txt",
+  "title": "测验题与详细解答",
+  "part": "VI 自测与参考",
+  "start": 516,
+  "end": 560,
+  "pages": 45,
+  "chars": 60450
+ },
+ {
+  "no": 34,
+  "file": "ch34.txt",
+  "title": "速查手册",
+  "part": "VI 自测与参考",
+  "start": 561,
+  "end": 567,
+  "pages": 7,
+  "chars": 8577
+ },
+ {
+  "no": 35,
+  "file": "ch35.txt",
+  "title": "总结与未来方向",
+  "part": "VI 自测与参考",
+  "start": 568,
+  "end": 599,
+  "pages": 32,
+  "chars": 91651
+ }
+]

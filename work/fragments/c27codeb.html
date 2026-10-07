@@ -1,0 +1,50 @@
+<!-- ▸ c27codeb · 代码实战:MCP Client 与 Host 连接池 -->
+<section class="slide codeslide" id="c27codeb" data-part="5" data-crumb="PART V · 代码 22" data-title="MCP Client·Host 池">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 22.2-22.3 · 书 p407-409</span><span class="tag c">Python</span><span class="tag c">asyncio</span></div>
+    <h2 class="k-h">Client 四阶段与 Host 连接池<span class="en">INITIALIZE · DISCOVER · CALL · ROUTE</span></h2>
+    <p class="k-lede">左侧:最小 Client 的握手—发现—调用四阶段;讲解卡:书中 22.7.3 的 MCPHost 连接池——多 server 时工具如何统一路由。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">import</span> asyncio
+<span class="k">from</span> mcp <span class="k">import</span> ClientSession, StdioServerParameters
+<span class="k">from</span> mcp.client.stdio <span class="k">import</span> stdio_client
+
+<span class="k">async def</span> <span class="f">main</span>():
+    params = <span class="f">StdioServerParameters</span>(          <span class="c">① 如何拉起 server 子进程</span>
+        command=<span class="s">"python"</span>, args=[<span class="s">"notes_server.py"</span>], env=<span class="k">None</span>)
+    <span class="k">async with</span> <span class="f">stdio_client</span>(params) <span class="k">as</span> (read, write):
+      <span class="k">async with</span> <span class="f">ClientSession</span>(read, write) <span class="k">as</span> session:
+        <span class="k">await</span> session.<span class="f">initialize</span>()            <span class="c">② 能力协商握手</span>
+
+        tools = <span class="k">await</span> session.<span class="f">list_tools</span>()    <span class="c">③ 工具发现</span>
+        <span class="k">for</span> t <span class="k">in</span> tools.tools:
+            <span class="f">print</span>(<span class="s">f" - </span>{t.name}<span class="s">: </span>{t.description[:60]}"</span>)
+
+        result = <span class="k">await</span> session.<span class="f">call_tool</span>(      <span class="c">④ 执行(先经用户同意)</span>
+            <span class="s">"create_note"</span>,
+            arguments={<span class="s">"title"</span>: <span class="s">"MCP Architecture Notes"</span>,
+                       <span class="s">"content"</span>: <span class="s">"MCP uses JSON-RPC 2.0."</span>,
+                       <span class="s">"tags"</span>: [<span class="s">"mcp"</span>]})
+        <span class="f">print</span>(<span class="s">f"Tool result: </span>{result.content[0].text}<span class="s">"</span>)
+
+asyncio.<span class="f">run</span>(main())</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①②</span>stdio 拉起 + 能力协商</div><div class="k-card-b">Client 以子进程方式启动 server,经 stdin/stdout 通信;initialize() 交换 protocolVersion 与 capabilities,之后全是 JSON-RPC 2.0。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">③</span>发现即集成</div><div class="k-card-b">server 动态注册的 tool 无需改 Client 代码——N 个应用×M 个工具的集成问题由此降为 N+M。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">④</span>同意门控在 Host</div><div class="k-card-b">带副作用的调用前,Host 须展示该 tool 将做什么、区分只读/破坏性并留审计日志;被攻破的 server 可借 resource 注入 prompt。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">+</span>多 server:MCPHost 连接池(22.7.3)</div><div class="k-card-b">书中给出 Host 池:tool_registry[tool.name]=(server, tool) 把工具名路由到正确会话——LLM 只见统一工具面。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>先启动 22.1 的 server,再 python notes_client.py;预期输出:Available tools: create_note / search_notes …与 Tool result: Note saved to …</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="34" r="4.5"/><text x="128" y="16">拉起子进程</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="48" r="4.5"/><text x="366" y="68">initialize 握手</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="28" r="4.5"/><text x="604" y="12">list_tools</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="846" y="64">call_tool</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p407-409</span></footer>
+</section>

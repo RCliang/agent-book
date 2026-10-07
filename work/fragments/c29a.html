@@ -1,0 +1,95 @@
+<!-- ▸ c29a · A2A:协议与任务生命周期(书 p422-426) -->
+<section class="slide" id="c29a" data-part="5" data-crumb="PART V · CH 24" data-title="A2A:协议与生命周期">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 24</span><span class="dim">书 p422-426</span><span class="tag c">A2A</span><span class="tag c">SSE</span></div>
+    <h2 class="k-h">A2A:协议与任务生命周期<span class="en">GOOGLE A2A · OPAQUE EXECUTION</span></h2>
+    <p class="k-lede">单一通才 Agent 无法兼顾知识广度与能力深度。Google 于 2025 年 4 月发布的开放协议 A2A,让异构 Agent 相互发现、委派与协作——<b>不透明执行</b>:不探查对方内部,只共享能力与任务。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num v"><b>2025.04</b><span>Google 发布 A2A,50+ 伙伴共建</span></div>
+      <div class="k-num"><b>150+</b><span>支持机构,已捐赠 Linux Foundation</span></div>
+      <div class="k-num c"><b>5</b><span>设计原则,不透明执行居首</span></div>
+      <div class="k-num"><b>7</b><span>任务状态:submitted→canceled</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>为何 Agent 要通信</div>
+          <div class="k-card-b">通才 Agent 难兼顾广度与深度。上下文有限、领域专业化(CodeAgent·LegalAgent)、并行扇出、故障隔离、任务交接——各献所长,短板委派。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>五条设计原则</div>
+          <div class="k-card-b"><b>不透明执行</b>:只经声明接口交互,不探查内部;企业就绪:OAuth 2.0·JWT·审计内建;<span class="cy">模态无关</span>;复用 HTTP+JSON-RPC 2.0+SSE;异步优先。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">03</span>Agent Card 与消息</div>
+          <div class="k-card-b">能力名片:.well-known/agent.json 上的 JSON 清单,声明能力·认证·端点·skills 示例,支撑能力路由;消息=role+parts(text·file·data)。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 336" role="img" aria-label="A2A 客户端与远程 Agent 交互时序:发现、委派、流式回传">
+          <defs>
+            <marker id="arw-c29" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/></marker>
+            <marker id="arw-c29v" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--verm)"/></marker>
+          </defs>
+          <!-- 两端 -->
+          <rect class="pop" style="--d:.2s" x="70" y="22" width="196" height="56" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)"/>
+          <text x="94" y="46" style="font-weight:700">调用方 Agent</text>
+          <text class="mut" x="94" y="66">编排器 · orchestrator</text>
+          <rect class="pop" style="--d:.35s" x="596" y="22" width="212" height="56" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <text x="620" y="46" style="font-weight:700">远程 Agent</text>
+          <text class="mut" x="620" y="66">不透明执行 · 内部实现无关</text>
+          <!-- 生命线 -->
+          <line x1="168" y1="78" x2="168" y2="268" stroke="var(--line)" stroke-width="1.2" stroke-dasharray="4 5"/>
+          <line x1="702" y1="78" x2="702" y2="268" stroke="var(--line)" stroke-width="1.2" stroke-dasharray="4 5"/>
+          <!-- Agent Card -->
+          <rect class="pop" style="--d:.55s" x="344" y="94" width="252" height="64" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)"/>
+          <text x="366" y="117" style="font-weight:700">Agent Card · 能力名片</text>
+          <text class="m" x="366" y="135">/.well-known/agent.json</text>
+          <text class="mut" x="366" y="152">capabilities·auth·skills·examples</text>
+          <!-- ① 发现 -->
+          <path class="draw" style="--d:.7s" pathLength="1" d="M168,126 L344,126" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw-c29)"/>
+          <text class="m" x="182" y="114" fill="var(--cyan)">① GET agent.json</text>
+          <path d="M344,176 L168,176" fill="none" stroke="var(--cyan)" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw-c29)"/>
+          <text class="mut" x="196" y="168">能力 · 认证方案 · 任务端点</text>
+          <!-- ② 委派 -->
+          <path class="draw" style="--d:.95s" pathLength="1" d="M168,224 L702,224" fill="none" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#arw-c29)"/>
+          <text x="210" y="244">② send_task · 消息 = role + parts(text·file·data)</text>
+          <!-- ③ 回传 -->
+          <path class="draw" style="--d:1.15s" pathLength="1" d="M702,262 L168,262" fill="none" stroke="var(--verm)" stroke-width="1.8" marker-end="url(#arw-c29v)"/>
+          <text x="210" y="282" fill="var(--verm)">③ SSE 流式回传产物 · 长任务走 webhook 推送通知</text>
+          <!-- 任务状态机 -->
+          <text class="mut" x="70" y="294">任务状态机</text>
+          <line x1="215" y1="308" x2="820" y2="308" stroke="var(--line)" stroke-width="1.2"/>
+          <line x1="215" y1="308" x2="555" y2="308" stroke="rgba(78,201,212,.5)" stroke-width="1.5"/>
+          <circle cx="215" cy="308" r="4" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="1.6"/>
+          <circle cx="310" cy="308" r="4" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="1.6"/>
+          <circle cx="430" cy="308" r="4" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="1.6"/>
+          <circle cx="555" cy="308" r="4.5" fill="var(--amber)"/>
+          <circle cx="655" cy="308" r="4" fill="var(--ink0)" stroke="rgba(147,166,200,.55)" stroke-width="1.4"/>
+          <circle cx="740" cy="308" r="4" fill="var(--ink0)" stroke="rgba(147,166,200,.55)" stroke-width="1.4"/>
+          <circle cx="820" cy="308" r="4" fill="var(--ink0)" stroke="rgba(147,166,200,.55)" stroke-width="1.4"/>
+          <text class="m" x="186" y="328" style="font-size:11px">submitted</text>
+          <text class="m" x="289" y="328" style="font-size:11px">working</text>
+          <text class="m" x="387" y="328" style="font-size:11px">input-required</text>
+          <text class="m" x="524" y="328" style="font-size:11px">completed</text>
+          <text class="m" x="636" y="328" style="font-size:11px">failed</text>
+          <text class="m" x="719" y="328" style="font-size:11px">rejected</text>
+          <text class="m" x="799" y="328" style="font-size:11px">canceled</text>
+        </svg>
+        <div class="figcap">图:A2A 客户—远程 Agent 交互——先经 Agent Card 发现能力,再 send_task 委派,SSE 流式回传或 webhook 推送;任务沿七态状态机推进(rejected 为 v1.0 新增)</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>认证与授权</b>按请求执行:Bearer(JWT/OAuth 2.0)、API 密钥、mTLS、OpenID Connect;还须校验授权 scope,否则多 Agent 系统会出现权限提升漏洞。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="120" y="16">为何通信</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">设计原则</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="530" y="12">能力名片</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="752" y="62">任务状态</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="988" y="66">SSE 流</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p422-426</span></footer>
+</section>

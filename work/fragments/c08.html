@@ -1,0 +1,97 @@
+<!-- ▸ c08 · 强化学习导论 (CH 03) -->
+<section class="slide" id="c08" data-part="1" data-crumb="PART I · CH 03" data-title="强化学习导论">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART I · CH 03</span><span class="dim">书 p121-132</span><span class="tag c">MDP</span><span class="tag c">TD</span><span class="tag c">GAE</span></div>
+    <h2 class="k-h">强化学习导论<span class="en">REINFORCEMENT LEARNING · MDP · TD · GAE</span></h2>
+    <p class="k-lede">智能体与环境<b>试错</b>交互、最大化长期累积奖励——不像监督学习需要标签,RL 从经验中学习。本章从 MDP 五元组与 TD 误差,走到策略梯度与 GAE,为 RLHF 筑底。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>γ∈[0,1]</b><span>折扣因子:未来奖励相对即时奖励的权重</span></div>
+      <div class="k-num v"><b>32K–128K</b><span>词表=动作空间:值方法 max 不可行</span></div>
+      <div class="k-num c"><b>60%</b><span>同策略:每步重新生成,生成占算力</span></div>
+      <div class="k-num"><b>5–50×</b><span>PBRS 塑形 F=γΦ(s′)−Φ(s)·不改最优策略</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>MDP:五元组与马尔可夫性</div>
+          <div class="k-card-b">状态 S·动作 A·转移 P(s′|s,a)·奖励 R·折扣 γ。<b class="hl">马尔可夫性质</b>:未来只依赖当前状态,问题因此可处理。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>TD 误差:「惊讶」即学习信号</div>
+          <div class="k-card-b">δ<sub>t</sub> = r<sub>t+1</sub> + γV(s<sub>t+1</sub>) − V(s<sub>t</sub>),即 <span class="cy">TD 目标 − 旧估计</span>。为正→提升价值;为负→降低;学习就是驱动 δ→0。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">03</span>Q-Learning 与重放缓冲区</div>
+          <div class="k-card-b">异策略值方法:max Q(s′,a′) 更新与行为策略无关——故能从<b class="hl">重放缓冲区</b>采样:打破相关性、防遗忘、提样本效率。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 336" role="img" aria-label="智能体-环境交互循环、三类 RL 方法与 GAE 偏差-方差谱线">
+          <!-- 区域小标 -->
+          <text class="m" x="150" y="14" fill="var(--faint)" style="letter-spacing:.18em">AGENT · ENV LOOP</text>
+          <text class="m" x="436" y="14" fill="var(--faint)" style="letter-spacing:.18em">METHOD FAMILIES</text>
+          <line x1="418" y1="22" x2="418" y2="182" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"/>
+          <!-- 智能体-环境循环 -->
+          <rect class="pop" style="--d:.35s" x="150" y="24" width="180" height="52" rx="9" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.6"/>
+          <text x="240" y="47" text-anchor="middle" style="font-weight:700">智能体 Agent</text>
+          <text class="mut" x="240" y="66" text-anchor="middle" style="font-size:11.5px">策略 π(a|s) · 选动作</text>
+          <rect class="pop" style="--d:.5s" x="150" y="130" width="180" height="52" rx="9" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="1.6"/>
+          <text x="240" y="153" text-anchor="middle" style="font-weight:700">环境 Environment</text>
+          <text class="mut" x="240" y="172" text-anchor="middle" style="font-size:11.5px">转移 P(s′|s,a) · 奖励 R</text>
+          <path class="draw" style="--d:.65s" d="M334,58 C368,74 368,105 341,119" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+          <polygon points="328,126 342,117 343,131" fill="var(--cyan)"/>
+          <text x="368" y="92" style="font-size:12px">动作 <tspan class="m">a</tspan><tspan class="m" dy="3" style="font-size:9.5px">t</tspan></text>
+          <path class="draw" style="--d:.8s" d="M146,124 C112,108 112,74 143,62" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+          <polygon points="150,52 136,59 152,66" fill="var(--cyan)"/>
+          <text x="6" y="88" style="font-size:12px">奖励 <tspan class="m">r</tspan><tspan class="m" dy="3" style="font-size:9.5px">t</tspan></text>
+          <text class="mut" x="6" y="106" style="font-size:11.5px">状态 <tspan class="m">s</tspan><tspan class="m" dy="3" style="font-size:9.5px">t+1</tspan></text>
+          <text class="mut" x="240" y="100" text-anchor="middle" style="font-size:12px">试错 Trial-and-Error</text>
+          <text class="mut" x="240" y="118" text-anchor="middle" style="font-size:11.5px">最大化长期累积奖励 G<tspan class="m" dy="2.5" style="font-size:9px">t</tspan></text>
+          <!-- 三类方法 -->
+          <line x1="421" y1="37" x2="431" y2="37" stroke="var(--cyan)" stroke-opacity=".45" stroke-width="1.5"/>
+          <line x1="421" y1="89" x2="431" y2="89" stroke="var(--cyan)" stroke-opacity=".45" stroke-width="1.5"/>
+          <line x1="421" y1="141" x2="431" y2="141" stroke="var(--cyan)" stroke-opacity=".45" stroke-width="1.5"/>
+          <text x="436" y="42" style="font-size:14px;font-weight:700">值方法 <tspan class="m" style="font-size:11px">Value-Based</tspan></text>
+          <text class="mut" x="436" y="61" style="font-size:12px">学 Q(s,a),argmax 得策略 · Q-Learning · DQN</text>
+          <rect x="796" y="29" width="50" height="19" rx="9.5" fill="var(--verm-bg)" stroke="var(--verm)" stroke-width="1"/>
+          <text x="821" y="42.5" text-anchor="middle" fill="var(--verm)" style="font-size:11px">异策略</text>
+          <text x="436" y="94" style="font-size:14px;font-weight:700">策略方法 <tspan class="m" style="font-size:11px">Policy-Based</tspan></text>
+          <text class="mut" x="436" y="113" style="font-size:12px">直接优化 πθ,「奖励加权的最大似然」· REINFORCE</text>
+          <rect x="796" y="81" width="50" height="19" rx="9.5" fill="var(--cyan-bg)" stroke="var(--cyan)" stroke-width="1"/>
+          <text x="821" y="94.5" text-anchor="middle" fill="var(--cyan)" style="font-size:11px">同策略</text>
+          <text x="436" y="146" style="font-size:14px;font-weight:700">Actor-Critic</text>
+          <text class="mut" x="436" y="165" style="font-size:12px">actor 提动作,critic 提供低方差基线 · A2C · PPO · GRPO</text>
+          <rect x="796" y="133" width="50" height="19" rx="9.5" fill="var(--cyan-bg)" stroke="var(--cyan)" stroke-width="1"/>
+          <text x="821" y="146.5" text-anchor="middle" fill="var(--cyan)" style="font-size:11px">同策略</text>
+          <!-- GAE λ 谱线 -->
+          <text x="24" y="224" style="font-size:14px;font-weight:700">GAE 广义优势估计:λ 是两种估计范式间的「滑尺」</text>
+          <text class="m" x="836" y="224" text-anchor="end" fill="var(--cyan)">Â<tspan dy="3" style="font-size:10px">t</tspan><tspan dy="-3"> = Σ (γλ)</tspan><tspan dy="-4" style="font-size:9px">l</tspan><tspan dy="4"> · δ</tspan><tspan dy="3" style="font-size:10px">t+l</tspan></text>
+          <path class="draw" style="--d:.9s" d="M60,288 L800,288" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+          <polygon points="812,288 798,282 798,294" fill="var(--cyan)"/>
+          <text class="m" x="52" y="272">λ=0</text>
+          <text class="m" x="808" y="272" text-anchor="end">λ=1</text>
+          <circle class="pop" style="--d:1.2s" cx="763" cy="288" r="5.5" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+          <text class="m" x="756" y="264" text-anchor="end" fill="var(--amber)">λ=0.95 · PPO 标准取值</text>
+          <text class="mut" x="60" y="312" style="font-size:12px">纯 TD:<tspan fill="var(--verm)">高偏差</tspan> · 低方差</text>
+          <text class="mut" x="430" y="312" text-anchor="middle" style="font-size:12px">λ∈[0.95,0.99] 最小化优势估计的总 MSE</text>
+          <text class="mut" x="800" y="312" text-anchor="end" style="font-size:12px">纯 MC:低偏差 · <tspan fill="var(--verm)">高方差</tspan></text>
+          <text class="mut" x="60" y="327" style="font-size:10.5px">自举:信任 V 的猜测</text>
+          <text class="mut" x="800" y="327" text-anchor="end" style="font-size:10.5px">信任完整环境轨迹</text>
+        </svg>
+        <div class="figcap">图 3.1/3.3 · 交互循环上的三类方法;下:GAE 的 λ 谱线——0 端纯 TD 高偏差·低方差,1 端纯 MC 低偏差·高方差,PPO 取 0.95</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>RLHF 之前,先懂 TD 误差</b>PPO 的 critic 靠最小化 TD 误差训练,优势来自 GAE——把多步 TD 误差按 (γλ)<sup>l</sup> 加权;GRPO 则完全去掉 critic,用组内统计量作基线。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="150" y="14" text-anchor="middle">MDP 五要素</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="330" y="72" text-anchor="middle">TD 误差</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="560" y="12" text-anchor="middle">Q-Learning</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="790" y="62" text-anchor="middle">Actor-Critic</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="1020" y="66" text-anchor="middle">GAE·λ</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part I 基础</span><span class="pg">p121-132</span></footer>
+</section>

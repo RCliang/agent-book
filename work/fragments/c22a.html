@@ -1,0 +1,90 @@
+<!-- ▸ c22a · 智能体记忆系统:类型与架构 -->
+<section class="slide" id="c22a" data-part="5" data-crumb="PART V · CH 17" data-title="记忆:类型与架构">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 17</span><span class="dim">书 p316-320</span><span class="tag c">RAG</span><span class="tag c">MemGPT</span></div>
+    <h2 class="k-h">记忆:类型与架构<span class="en">MEMORY TYPES · ARCHITECTURES</span></h2>
+    <p class="k-lede">LLM 本质无状态:GPT-4o 上下文 <b>128K</b> Token,而一本典型书籍约 <b>670K</b>——数日运行的 Agent 累积的观察必然溢出。记忆系统是对这一物理约束的<b>工程回应</b>。</p>
+  </header>
+  <div class="s-body">
+    <div class="grid4">
+      <div class="k-card fu" style="--d:.05s">
+        <div class="k-card-t"><span class="no">01</span>工作记忆 Working</div>
+        <div class="k-card-b">上下文内的工作区:草稿板、思维链、对话历史。<b>零检索延迟</b>,易失,受 L 约束。</div>
+      </div>
+      <div class="k-card fu" style="--d:.1s">
+        <div class="k-card-t"><span class="no">02</span>情景记忆 Episodic</div>
+        <div class="k-card-b">过往事件按时间索引:成功轨迹作<span class="cy">少样本范例</span>,失败案例带根因标注。</div>
+      </div>
+      <div class="k-card fu" style="--d:.15s">
+        <div class="k-card-t"><span class="no">03</span>语义记忆 Semantic</div>
+        <div class="k-card-b">上下文无关的事实与概念:实体关系、领域本体、知识图谱 <span class="cy">G=(V,E)</span>。</div>
+      </div>
+      <div class="k-card fu" style="--d:.2s">
+        <div class="k-card-t"><span class="no">04</span>程序记忆 Procedural</div>
+        <div class="k-card-b">自动化的技能:工具使用模式、多步动作序列;<b>权重 θ 即程序记忆</b>,微调即巩固。</div>
+      </div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.24s">
+          <div class="k-card-t"><span class="no">05</span>为什么需要记忆</div>
+          <div class="k-card-b">滚出窗口即<b>灾难性遗忘</b>;无情景存储,经验无法复用;无用户模型,每轮<b>冷启动</b>。</div>
+        </div>
+        <div class="k-card fu" style="--d:.3s">
+          <div class="k-card-t"><span class="no">06</span>五大架构家族</div>
+          <div class="k-card-b">RAG 向量检索 · 摘要压缩 · 知识图谱 · 键值记忆网络 · <span class="am">MemGPT 分层</span>——按容量、延迟、可训练性取舍。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.28s">
+        <svg viewBox="0 0 860 280" role="img" aria-label="MemGPT 虚拟上下文管理:主上下文与外部存储之间的页入与页出">
+          <defs>
+            <marker id="c22a-ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/>
+            </marker>
+          </defs>
+          <!-- 主上下文 -->
+          <rect class="pop" style="--d:.35s" x="30" y="56" width="280" height="150" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.5)" stroke-width="1.5"/>
+          <text x="52" y="84" style="font-weight:700">主上下文 · Main Context</text>
+          <text class="m" x="52" y="104" fill="var(--cyan)">0 ms · O(L) Token</text>
+          <line x1="52" y1="116" x2="288" y2="116" stroke="var(--line)" stroke-width="1"/>
+          <text class="mut" x="52" y="138">系统提示与用户偏好</text>
+          <text class="mut" x="52" y="158">最近对话历史</text>
+          <text class="mut" x="52" y="178">工作记忆:草稿板 · 思维链</text>
+          <!-- 外部存储 -->
+          <g class="pop" style="--d:.5s">
+            <rect x="550" y="22" width="280" height="218" rx="8" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <text x="572" y="48" style="font-weight:700">外部存储 · External Storage</text>
+            <text class="m" x="572" y="66" fill="var(--amber)">容量无上限 · 0–100 ms</text>
+            <rect x="566" y="82" width="248" height="44" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+            <text x="584" y="100" style="font-weight:700">情景记忆</text><text class="mut" x="584" y="117">Episode 向量存储 · 时间索引</text>
+            <rect x="566" y="136" width="248" height="44" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+            <text x="584" y="154" style="font-weight:700">语义记忆</text><text class="mut" x="584" y="171">事实 · 概念 · 知识图谱</text>
+            <rect x="566" y="190" width="248" height="44" rx="6" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+            <text x="584" y="208" style="font-weight:700">程序记忆</text><text class="mut" x="584" y="225">技能 · 工具使用模式</text>
+          </g>
+          <!-- 页入 / 页出 -->
+          <line class="draw" style="--d:.75s" pathLength="1" x1="545" y1="100" x2="322" y2="100" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#c22a-ah)"/>
+          <text class="m" x="433" y="86" text-anchor="middle" fill="var(--cyan)">页入 Page-In</text>
+          <line class="draw" style="--d:1s" pathLength="1" x1="322" y1="186" x2="545" y2="186" stroke="var(--cyan)" stroke-width="1.8" marker-end="url(#c22a-ah)"/>
+          <text class="m" x="433" y="206" text-anchor="middle" fill="var(--cyan)">页出 Page-Out</text>
+          <text class="mut" x="433" y="146" text-anchor="middle">近期性 · 相关性 · 重要性</text>
+          <!-- 自驱动记忆管理 -->
+          <rect class="pop" style="--d:1.2s" x="30" y="248" width="800" height="26" rx="6" fill="var(--verm-bg)"/>
+          <text x="48" y="265" style="font-weight:700" fill="var(--verm)">自驱动记忆管理</text>
+          <text class="m" x="164" y="265">LLM 发出 memory_search · memory_insert · memory_delete,记忆管理成为可学习行为</text>
+        </svg>
+        <div class="figcap">图 · MemGPT 虚拟上下文管理(p319-320):主上下文与外部存储之间按近期性、相关性与重要性页入/页出</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.36s"><b>检索的陷阱</b>RAG 不消除幻觉,反而可能引入:过时或表面相关的文档会被自信采纳——须附来源元数据,并做忠实性校验。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="114" y="16">上下文瓶颈</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="298" y="72">四类记忆</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="524" y="12">RAG 检索</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="754" y="62">知识图谱</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="988" y="66">MemGPT</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p316-320</span></footer>
+</section>

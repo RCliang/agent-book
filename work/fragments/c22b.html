@@ -1,0 +1,70 @@
+<!-- ▸ c22b · 智能体记忆系统:操作与前沿 -->
+<section class="slide" id="c22b" data-part="5" data-crumb="PART V · CH 17" data-title="记忆操作与前沿">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 17</span><span class="dim">书 p316-340</span><span class="tag c">Mem0</span><span class="tag am">CoALA</span></div>
+    <h2 class="k-h">记忆操作与前沿<span class="en">WRITE · RETRIEVE · REFLECT · RL</span></h2>
+    <p class="k-lede">记忆不是被动仓库,而是认知的主动参与者:<b>读—行动—反思—写入</b>循环;CoALA 给出设计语言,前沿正从反应式检索走向<b>预判式注入</b>。</p>
+  </header>
+  <div class="s-body">
+    <ul class="k-flow fu" style="--d:.05s">
+      <li>写入 · 重要性 τ 过滤</li>
+      <li>读取 · HyDE+时间衰减</li>
+      <li>更新 · 冲突解决与巩固</li>
+      <li>反思 · 情景→语义洞见</li>
+    </ul>
+    <table class="k-table fu" style="--d:.12s">
+      <thead><tr><th>记忆类型</th><th>内容</th><th>机制</th><th>例子(软件开发 Agent · p318)</th></tr></thead>
+      <tbody>
+        <tr><td>工作记忆</td><td>当前任务的活动信息</td><td>上下文内 · 0 ms</td><td>正在编辑的文件与刚收到的报错</td></tr>
+        <tr><td>情景记忆</td><td>具体过往事件与轨迹</td><td>向量检索 · 时间索引</td><td>「上周在模块 X 修过类似 NPE」</td></tr>
+        <tr><td>语义记忆</td><td>通用事实与领域概念</td><td>知识图谱 · 结构化查询</td><td>asyncio.gather 的异常传播规则</td></tr>
+        <tr><td>程序记忆</td><td>自动化技能与流程</td><td>权重 θ · 动作序列</td><td>调试流程:复现→隔离→假设→验证→修复</td></tr>
+      </tbody>
+    </table>
+    <div class="grid4">
+      <div class="k-card fu" style="--d:.18s">
+        <div class="k-card-t"><span class="no">01</span>个性化·用户建模</div>
+        <div class="k-card-b">持久用户模型 U:显式/隐式偏好、专业水平、目标;自适应详尽度与<b>主动回忆</b>。</div>
+      </div>
+      <div class="k-card fu" style="--d:.23s">
+        <div class="k-card-t"><span class="no">02</span>多智能体·共享记忆</div>
+        <div class="k-card-b"><span class="cy">blackboard</span> 解耦读写,M<sub>shared</sub> 之外各留私有 M<sub>i</sub>;共识:投票·置信度加权·版本化。</div>
+      </div>
+      <div class="k-card fu" style="--d:.28s">
+        <div class="k-card-t"><span class="no">03</span>RL 训练「记什么」</div>
+        <div class="k-card-b">奖励=任务回传+检索精度−冗余写入+一致性;方法:<b>事后重标记</b>·元 RL·好奇心存储。</div>
+      </div>
+      <div class="k-card fu" style="--d:.33s">
+        <div class="k-card-t"><span class="no">04</span>评估·维度与基准</div>
+        <div class="k-card-b"><span class="am">LongMemEval</span> 五能力:抽取·跨会话·时序·更新·拒答;LOCOMO、InfiniteBench;召回·精确·Token 效率。</div>
+      </div>
+    </div>
+    <div class="grid4">
+      <div class="k-card fu" style="--d:.38s">
+        <div class="k-card-t"><span class="no">05</span>Mem0 生产记忆层</div>
+        <div class="k-card-b">自动抽取事实并巩固,关系图支持多跳;LOCOMO <b>提升 26%</b>,p95 延迟降 <b>91%</b>。</div>
+      </div>
+      <div class="k-card fu" style="--d:.43s">
+        <div class="k-card-t"><span class="no">06</span>Sleep-Time Compute</div>
+        <div class="k-card-b">空闲时段预计算查询与推理链;测试时计算降约 <b>5×</b>,多查询摊销成本降 <b>2.5×</b>。</div>
+      </div>
+      <div class="k-card fu" style="--d:.48s">
+        <div class="k-card-t"><span class="no">07</span>A-MEM · Zettelkasten</div>
+        <div class="k-card-b">结构化笔记+<span class="cy">动态双向链接</span>;新记忆触发旧记忆更新,记忆成演进中的活体结构。</div>
+      </div>
+      <div class="k-card fu" style="--d:.53s">
+        <div class="k-card-t"><span class="no">08</span>主动记忆 · Meta AI</div>
+        <div class="k-card-b">对抗<b>行为状态衰减</b>:漂移前注入约束;成本 +40%,100+ 次调用成功率保持稳定。</div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="137" y="16">写入</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="290" y="72">检索·HyDE</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="547" y="12">反思</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="758" y="62">共享记忆</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="988" y="66">主动记忆</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p316-340</span></footer>
+</section>

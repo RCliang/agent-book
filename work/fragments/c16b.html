@@ -1,0 +1,56 @@
+<!-- ▸ c16b · 基础设施:瓶颈·成本·容错(书 Ch11 下,p206-219) -->
+<section class="slide" id="c16b" data-part="2" data-crumb="PART II · CH 11" data-title="基础设施:瓶颈·成本·容错">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 11</span><span class="dim">书 p206-219</span><span class="tag c">MFU</span><span class="tag c">β2=0.95</span></div>
+    <h2 class="k-h">基础设施:瓶颈·成本·容错<span class="en">BOTTLENECK · COST · FAULT TOLERANCE</span></h2>
+    <p class="k-lede">生成被显存带宽卡死,训练看 MFU;数值稳定是 RL 的隐形地基——FP32 master 权重与梯度裁剪缺一即崩。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>1 F/B</b><span>自回归生成算术强度 · 低于 roofline 拐点 156×</span></div>
+      <div class="k-num v"><b>0.6%</b><span>batch=1 生成 FLOPs 利用率——GPU 在等显存</span></div>
+      <div class="k-num c"><b>&gt;40%</b><span>训练 MFU 目标(LLaMA-70B 实测 45%)</span></div>
+      <div class="k-num"><b>$7,500</b><span>70B 完整对齐成本(10K 步·64 卡·重叠后)</span></div>
+    </div>
+    <div class="split-50">
+      <div class="col">
+        <table class="k-table fu" style="--d:.1s">
+          <thead><tr><th>方法</th><th>LR</th><th>调度</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>DPO</td><td class="m">5e-7</td><td>常数 · 50 步 warmup</td><td class="mut">β=0.1 · 1 epoch</td></tr>
+            <tr><td>PPO policy</td><td class="m">1e-6</td><td>常数 · 20 步 warmup</td><td class="mut">自适应 KL · target 6</td></tr>
+            <tr><td>PPO critic</td><td class="m">1e-6</td><td>常数</td><td class="mut">与 policy 同步</td></tr>
+            <tr><td>GRPO</td><td class="m">1e-6</td><td>常数</td><td class="mut">组基线 · 免 critic</td></tr>
+          </tbody>
+        </table>
+        <div class="k-code fu" style="--d:.18s"><pre>AdamW · β1=0.9 · β2=0.95(二阶矩窗口 ~20 步) · ε=1e-8
+max_grad_norm=1.0 · weight_decay=0(KL 惩罚即正则)
+LR 比 SFT 小 10-100× · 临界 batch Bcrit ≈ 1-4M token</pre></div>
+      </div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.12s">
+          <div class="k-card-t"><span class="no">01</span>解耦式架构与权重同步</div>
+          <div class="k-card-b">生成(带宽)与训练(算力)分集群:gen(N+1) 重叠 train(N)→加速 <b>30-40%</b>;同步滞后 50 步损失 &lt;2%。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>数值稳定三件套</div>
+          <div class="k-card-b">纯 BF16 必崩于 100-500 步——须 <span class="cy">FP32 master</span>;一步 ∥∇∥&gt;50 未裁剪即毁,<b>裁剪 1.0 绝不关</b>;恒定调度保响应。</div>
+        </div>
+        <div class="k-card fu" style="--d:.24s">
+          <div class="k-card-t"><span class="no">03</span>容错与诊断</div>
+          <div class="k-card-b">512 卡每 <b>4-8 小时</b>一遇故障,checkpoint 每 50-100 步异步存(&lt;1s);reward 升后崩→LR 降 2-5×,KL&gt;15 nat→降 10×。</div>
+        </div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.32s"><b>MoE 在 RL 中</b>同算力容量 ×3-4、对 reward 模型尤其有利;但专家 all-to-all 通信与 PP 冲突。GRPO+MoE 相性佳——生成成本由激活参数主导。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">生成瓶颈</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="304" y="72">解耦</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="522" y="12">权重同步</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="750" y="62">数值稳定</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="988" y="66">MoE</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II · 基础设施</span><span class="pg">p206-219</span></footer>
+</section>

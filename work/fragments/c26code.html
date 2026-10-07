@@ -1,0 +1,49 @@
+<!-- ▸ c26code · 代码实战:最小的自定义 LLM Agent 环境 -->
+<section class="slide" id="c26code" data-part="5" data-crumb="PART V · 代码 21" data-title="最小 Agent 环境">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 21.1 · 书 p393-395</span><span class="tag c">Python</span><span class="tag c">stdlib</span></div>
+    <h2 class="k-h">最小的自定义 LLM Agent 环境<span class="en">GYMNASIUM · RESET/STEP 契约</span></h2>
+    <p class="k-lede">书 21.8 的 FileEditEnv:Agent 面对一个含 bug 的文件与失败的测试,不断编辑直到通过;观察与动作均为纯字符串,奖励来自真实运行测试而非 LLM 裁判。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">@dataclass</span>
+<span class="k">class</span> <span class="f">StepResult</span>:
+    observation: <span class="k">str</span>    <span class="c">输入给 LLM 的文本</span>
+    reward: <span class="k">float</span>       <span class="c">0.0 或 1.0</span>
+    terminated: <span class="k">bool</span>    <span class="c">任务解决或达最大步数</span>
+    truncated: <span class="k">bool</span>     <span class="c">预算超出被截断</span>
+<span class="k">class</span> <span class="f">FileEditEnv</span>:   <span class="c">动作: view | edit | run_tests | submit</span>
+    <span class="k">def</span> <span class="f">reset</span>(self, seed: <span class="k">int</span> | <span class="k">None</span> = <span class="k">None</span>):  <span class="c">① 新回合</span>
+        self._workdir = Path(<span class="f">tempfile.mkdtemp</span>(prefix=<span class="s">"fileenv_"</span>))
+        (self._workdir / <span class="s">"solution.py"</span>).<span class="f">write_text</span>(self.buggy_code)
+        self._step_count = 0
+        <span class="k">return</span> self.<span class="f">_build_observation</span>(...), {<span class="s">"step"</span>: 0}
+    <span class="k">def</span> <span class="f">step</span>(self, action: <span class="k">str</span>) -&gt; <span class="f">StepResult</span>: <span class="c">② 一步交互</span>
+        self._step_count += 1
+        <span class="k">if</span> action.<span class="f">startswith</span>(<span class="s">"edit"</span>): self.<span class="f">_action_edit</span>(action)
+        test_output = self.<span class="f">_run_tests</span>()  <span class="c">隔离子进程 + 超时</span>
+        passed = <span class="s">"passed"</span> <span class="k">in</span> test_output <span class="k">and</span> <span class="s">"failed"</span> <span class="k">not in</span> test_output
+        reward = 1.0 <span class="k">if</span> passed <span class="k">else</span> 0.0  <span class="c">③ 基于执行的奖励</span>
+        terminated = passed <span class="k">or</span> action.<span class="f">startswith</span>(<span class="s">"submit"</span>)
+        truncated = self._step_count &gt;= self.MAX_STEPS  <span class="c">④ 步数上限</span>
+        <span class="k">return</span> <span class="f">StepResult</span>(self.<span class="f">_build_observation</span>(action, test_output),
+                          reward, terminated, truncated)</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①②</span>reset/step 契约为何关键</div><div class="k-card-b">遵循 Gymnasium 标准 API 的环境可直接接入 RL 训练框架;seed 化 reset 让任意轨迹精确重放,重建隔离工作目录,检查点可支持树搜索式探索。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">③</span>reward 与 done 的语义</div><div class="k-card-b">奖励来自实际运行测试套件而非 LLM 裁判,二元 0/1 抗 reward hacking;terminated=任务解决,truncated=预算截断——两种结束必须分开。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">④</span>步数上限防拖垮</div><div class="k-card-b">MAX_STEPS=20 是 Episode 硬上限;每次测试在带 30s 超时的独立子进程运行,Agent 陷入死循环也不会拖垮外层训练循环。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">+</span>并行采集数据(21.5.4)</div><div class="k-card-b">RL 训练需数百万次环境交互:进程级并行、异步 rollout worker 重叠推理延迟、向量化环境批处理 step;云上用 Ray/SLURM 分发,回放缓冲聚合轨迹。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>仅标准库 · python minimal_env.py 内置演示:修复 buggy 的 add()(应为加号)并提交;预期输出 Reward: 1.0 | Terminated: True。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="122" y="16">reset 重建</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="48" r="4.5"/><text x="364" y="68">step 契约</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="596" y="14">奖励 0|1</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="844" y="64">并行采集</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p393-395</span></footer>
+</section>

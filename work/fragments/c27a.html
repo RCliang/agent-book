@@ -1,0 +1,98 @@
+<!-- ▸ c27a · Ch22 MCP:架构与原语 -->
+<section class="slide" id="c27a" data-part="5" data-crumb="PART V · CH 22" data-title="MCP:架构与原语">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 22</span><span class="dim">书 p398-405</span><span class="tag c">JSON-RPC 2.0</span><span class="tag c">N×M→N+M</span></div>
+    <h2 class="k-h">MCP:架构与原语<span class="en">HOST · CLIENT · SERVER · FOUR PRIMITIVES</span></h2>
+    <p class="k-lede">每个新框架都在重写工具连接器。MCP(Anthropic 2024)以 JSON-RPC 2.0 统一接口,把 N×M 集成压成 N+M——如 USB 之于设备。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>N+M</b><span>20 框架×50 工具:1000→70(−14×)</span></div>
+      <div class="k-num v"><b>4</b><span>原语 Tools·Resources·Prompts·Sampling</span></div>
+      <div class="k-num c"><b>2</b><span>传输 stdio·Streamable HTTP</span></div>
+      <div class="k-num"><b>3</b><span>角色 Host·Client·Server</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>工具集成问题</div>
+          <div class="k-card-b">每个框架×每个工具都要定制连接器,负担<b>平方级</b>增长;MCP 让各方只实现一次协议——类比 USB·HTTP·LSP。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>三角色模型</div>
+          <div class="k-card-b">Host 管体验与安全策略,内含一或多个 Client;Client 与单个 Server <span class="cy">一对一有状态会话</span>;Server 是既有 API 的薄包装。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">03</span>生命周期与传输</div>
+          <div class="k-card-b">四阶段:initialize→<span class="cy">能力协商</span>→运行→关闭;传输 stdio(本地子进程)或 Streamable HTTP(可升级 SSE 流)。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 340" role="img" aria-label="MCP 架构:Host 内多个 Client 经 stdio 或 Streamable HTTP 与多个 Server 保持有状态会话,右侧为四大原语">
+          <text class="m" x="24" y="18" style="letter-spacing:.18em">MCP ARCHITECTURE · STATEFUL SESSIONS</text>
+          <rect x="24" y="26" width="560" height="174" rx="10" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="m" x="40" y="46" style="fill:var(--amber);letter-spacing:.14em">MCP HOST · 用户同意 · 安全策略 · 审计日志</text>
+          <rect class="pop" style="--d:.3s" x="40" y="56" width="528" height="42" rx="8" fill="var(--ink0)" stroke="rgba(78,201,212,.4)"/>
+          <text x="304" y="82" text-anchor="middle" style="font-weight:700">LLM —— 决定调用哪个工具 · 整理结果</text>
+          <rect x="40" y="112" width="160" height="46" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="120" y="131" text-anchor="middle" style="font-weight:700">MCP Client</text>
+          <text class="mut" x="120" y="149" text-anchor="middle">与单个 Server 一对一</text>
+          <rect x="216" y="112" width="160" height="46" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="296" y="131" text-anchor="middle" style="font-weight:700">MCP Client</text>
+          <text class="mut" x="296" y="149" text-anchor="middle">协议协商·序列化</text>
+          <rect x="392" y="112" width="160" height="46" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="472" y="131" text-anchor="middle" style="font-weight:700">MCP Client</text>
+          <text class="mut" x="472" y="149" text-anchor="middle">连接生命周期管理</text>
+          <path class="draw" style="--d:.55s" pathLength="1" d="M120,98 V112 M296,98 V112 M472,98 V112 M120,158 V232 M296,158 V232 M472,158 V232" fill="none" stroke="var(--cyan)" stroke-width="1.6"/>
+          <polygon points="120,238 115,228 125,228" fill="var(--cyan)"/>
+          <polygon points="296,238 291,228 301,228" fill="var(--cyan)"/>
+          <polygon points="472,238 467,228 477,228" fill="var(--cyan)"/>
+          <text class="m" x="128" y="216" style="fill:var(--amber)">stdio</text>
+          <text class="m" x="304" y="216" style="fill:var(--amber)">stdio</text>
+          <text class="m" x="464" y="216" text-anchor="end" style="fill:var(--amber)">Streamable HTTP</text>
+          <rect x="40" y="232" width="160" height="64" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="120" y="256" text-anchor="middle" style="font-weight:700">文件系统 Server</text>
+          <text class="mut" x="120" y="276" text-anchor="middle">本地 I/O·薄包装</text>
+          <rect x="216" y="232" width="160" height="64" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="296" y="256" text-anchor="middle" style="font-weight:700">GitHub Server</text>
+          <text class="mut" x="296" y="276" text-anchor="middle">Issue·PR·提交历史</text>
+          <rect class="pop" style="--d:1s" x="392" y="232" width="160" height="64" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="472" y="256" text-anchor="middle" style="font-weight:700">Postgres Server</text>
+          <text class="mut" x="472" y="276" text-anchor="middle">只读 SQL 查询</text>
+          <rect x="604" y="26" width="232" height="264" rx="10" fill="var(--ink1)" stroke="var(--line)"/>
+          <text class="m" x="620" y="46" style="fill:var(--amber);letter-spacing:.14em">四大原语 PRIMITIVES</text>
+          <rect x="616" y="56" width="208" height="48" rx="6" fill="var(--ink2)" stroke="rgba(78,201,212,.35)"/>
+          <text x="628" y="75" style="font-weight:700">Tools</text>
+          <text class="m" x="812" y="75" text-anchor="end">C→S</text>
+          <text class="mut" x="628" y="93">LLM 调用·带副作用</text>
+          <rect x="616" y="110" width="208" height="48" rx="6" fill="var(--ink2)" stroke="rgba(78,201,212,.35)"/>
+          <text x="628" y="129" style="font-weight:700">Resources</text>
+          <text class="m" x="812" y="129" text-anchor="end">C←S</text>
+          <text class="mut" x="628" y="147">上下文数据·URI·订阅</text>
+          <rect x="616" y="164" width="208" height="48" rx="6" fill="var(--ink2)" stroke="rgba(78,201,212,.35)"/>
+          <text x="628" y="183" style="font-weight:700">Prompts</text>
+          <text class="m" x="812" y="183" text-anchor="end">C←S</text>
+          <text class="mut" x="628" y="201">可复用 prompt 模板</text>
+          <rect class="pop" style="--d:1.2s" x="616" y="218" width="208" height="48" rx="6" fill="var(--ink0)" stroke="rgba(255,82,56,.45)"/>
+          <text x="628" y="237" style="font-weight:700;fill:var(--verm)">Sampling</text>
+          <text class="m" x="812" y="237" text-anchor="end">S→C</text>
+          <text class="mut" x="628" y="255">Server 请求 Host 推理</text>
+          <rect x="24" y="298" width="812" height="40" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text x="40" y="314" style="font-weight:700">线协议 JSON-RPC 2.0:Request(期待响应) · Response · Notification(无 id 单向通知)</text>
+          <text class="mut" x="40" y="331">工具发现:tools/list 动态注册 · inputSchema=JSON Schema · name+description 决定 LLM 选哪个工具</text>
+        </svg>
+        <div class="figcap">图 22.2 · MCP 架构:Host 内多个 Client 与多个 Server 保持有状态会话;Server 包装外部服务,经 stdio 或 Streamable HTTP 传输</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>Sampling 反转</b>唯一方向相反的原语:Server 请求 Host 执行一次 LLM 推理,Host 保留完全控制权——server 无需自备模型。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text text-anchor="middle" x="150" y="14">集成爆炸</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text text-anchor="middle" x="330" y="72">三角色</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text text-anchor="middle" x="560" y="12">传输层</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text text-anchor="middle" x="790" y="62">四原语</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text text-anchor="middle" x="1020" y="30">JSON-RPC</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p398-405</span></footer>
+</section>

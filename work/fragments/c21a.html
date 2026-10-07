@@ -1,0 +1,96 @@
+<!-- ▸ c21a · Ch16 检索增强生成(上):架构、检索方法与分块 -->
+<section class="slide" id="c21a" data-part="5" data-crumb="PART V · CH 16" data-title="RAG:架构与检索">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 16</span><span class="dim">书 p293-315</span><span class="tag c">BM25</span><span class="tag c">RRF</span></div>
+    <h2 class="k-h">检索增强生成:架构与检索<span class="en">SPARSE · DENSE · HYBRID · CHUNKING</span></h2>
+    <p class="k-lede">LLM 把知识压进权重,难逃<b>幻觉、过时、领域盲区</b>。RAG 配上动态可更新的外部记忆——对检索证据边缘化,让响应<b>有据可查、可验证</b>。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>1.2-2.0</b><span>BM25 k₁ 取值·b=0.75</span></div>
+      <div class="k-num v"><b>k=60</b><span>RRF 平滑常数·按排名融合</span></div>
+      <div class="k-num c"><b>36.8</b><span>SPLADEv2 MRR@10·v1 为 34.0</span></div>
+      <div class="k-num"><b>5-10×</b><span>PLAID 索引降低 ColBERT 延迟</span></div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.1s">
+          <div class="k-card-t"><span class="no">01</span>参数化 vs 非参数化</div>
+          <div class="k-card-b">知识压进权重,难逃幻觉、过时、领域盲区。RAG 按检索分布 P(d|q) 边缘化证据——给学者发一张「图书证」。</div>
+        </div>
+        <div class="k-card fu" style="--d:.18s">
+          <div class="k-card-t"><span class="no">02</span>RAG·微调·长上下文选型</div>
+          <div class="k-card-b">微调教如何推理,RAG 供内容,互补。更新频繁/需引用/专有语料→RAG;风格/新技能/低延迟→微调;装得进窗口→长上下文。</div>
+        </div>
+        <div class="k-card fu" style="--d:.26s">
+          <div class="k-card-t"><span class="no">03</span>分块策略</div>
+          <div class="k-card-b">固定重叠 512/64 是默认;语义分块切在相似度谷底;结构分块按标题/函数、表格不拆;父子块:检索 128,回传 512。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.2s">
+        <svg viewBox="0 0 860 336" role="img" aria-label="端到端 RAG 流水线:文档→分块→嵌入→向量库→检索→重排→生成">
+          <text class="m" x="24" y="26" style="letter-spacing:.18em">离线索引 · OFFLINE · 一次构建</text>
+          <!-- 顶行:索引管道 -->
+          <rect x="24" y="42" width="180" height="58" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="114" y="66" text-anchor="middle" style="font-weight:700">文档加载</text>
+          <text class="mut" x="114" y="85" text-anchor="middle">PDF·HTML·MD·元数据</text>
+          <line x1="204" y1="71" x2="236" y2="71" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="242,71 233,67 233,75" fill="var(--cyan)"/>
+          <rect x="244" y="42" width="150" height="58" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="319" y="66" text-anchor="middle" style="font-weight:700">分块</text>
+          <text class="mut" x="319" y="85" text-anchor="middle">512 Token·重叠 64</text>
+          <line x1="394" y1="71" x2="426" y2="71" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="432,71 423,67 423,75" fill="var(--cyan)"/>
+          <rect x="434" y="42" width="150" height="58" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="509" y="66" text-anchor="middle" style="font-weight:700">嵌入 fϕ</text>
+          <text class="mut" x="509" y="85" text-anchor="middle">e = fϕ(c)·d 维向量</text>
+          <line x1="584" y1="71" x2="616" y2="71" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="622,71 613,67 613,75" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:.55s" x="624" y="42" width="212" height="58" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="730" y="66" text-anchor="middle" style="font-weight:700">向量数据库</text>
+          <text class="mut" x="730" y="85" text-anchor="middle">向量+原文+元数据</text>
+          <!-- 向量库 → 检索 -->
+          <path class="draw" style="--d:.75s" pathLength="1" d="M730,100 V150 H309 V190" fill="none" stroke="var(--cyan)" stroke-width="1.8"/>
+          <polygon points="309,196 304,187 314,187" fill="var(--cyan)"/>
+          <text class="mut" x="470" y="142" text-anchor="middle">ANN 近似检索:IVF · HNSW O(log N) · PQ</text>
+          <text class="m" x="24" y="182" style="letter-spacing:.18em">在线检索—生成 · ONLINE · 每查询</text>
+          <!-- 底行:检索-生成管道 -->
+          <rect x="24" y="196" width="150" height="58" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="99" y="220" text-anchor="middle" style="font-weight:700">查询编码</text>
+          <text class="mut" x="99" y="239" text-anchor="middle">q = fϕ(q)</text>
+          <line x1="174" y1="225" x2="206" y2="225" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="212,225 203,221 203,229" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:.95s" x="214" y="196" width="190" height="58" rx="8" fill="var(--verm-bg)" stroke="var(--verm)" stroke-width="1.5"/>
+          <text x="309" y="217" text-anchor="middle" style="font-weight:700">检索 top-k</text>
+          <text class="mut" x="309" y="234" text-anchor="middle">余弦相似·取前 k 块</text>
+          <text class="m" x="309" y="249" text-anchor="middle">sim = q·e/(∥q∥·∥e∥)</text>
+          <line x1="404" y1="225" x2="436" y2="225" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="442,225 433,221 433,229" fill="var(--cyan)"/>
+          <rect x="444" y="196" width="150" height="58" rx="8" fill="var(--ink2)" stroke="rgba(78,201,212,.4)"/>
+          <text x="519" y="220" text-anchor="middle" style="font-weight:700">重排</text>
+          <text class="mut" x="519" y="239" text-anchor="middle">交叉编码器精排</text>
+          <line x1="594" y1="225" x2="626" y2="225" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="632,225 623,221 623,229" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:1.15s" x="634" y="196" width="202" height="58" rx="8" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="735" y="220" text-anchor="middle" style="font-weight:700">生成 + 引用</text>
+          <text class="mut" x="735" y="239" text-anchor="middle">仅凭上下文·[Doc N]</text>
+          <!-- 检索方法速览 -->
+          <rect class="pop" style="--d:1.35s" x="24" y="268" width="812" height="46" rx="8" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.35)"/>
+          <text x="430" y="288" text-anchor="middle" style="font-weight:700">BM25/TF-IDF 稀疏 · DPR 稠密 · RRF 混合 k=60 · SPLADE 学习式稀疏 · ColBERT 晚期交互</text>
+          <text class="mut" x="430" y="306" text-anchor="middle">DPR 双塔对比学习·SPLADE 以 MLM 头扩展词项·ColBERT MaxSim 晚期交互·RRF 在排名上融合,免分数不可比</text>
+        </svg>
+        <div class="figcap">图 16.1 · 端到端 RAG:离线管道一次建索引,在线管道逐查询检索—重排—生成</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>最佳实践</b>分块得当的朴素 RAG 往往胜过分块糟糕的复杂系统;先修好检索,再优化生成;top-20 交叉编码器重排 ROI 最高。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s" transform="translate(150,30)"><circle r="4.5"/><text text-anchor="middle" y="-12">分块</text></g>
+    <g class="rn" style="--d:.55s" transform="translate(330,52)"><circle r="4.5"/><text text-anchor="middle" y="24">嵌入</text></g>
+    <g class="rn" style="--d:.8s" transform="translate(560,26)"><circle r="4.5"/><text text-anchor="middle" y="-12">检索</text></g>
+    <g class="rn" style="--d:1.05s" transform="translate(790,42)"><circle r="4.5"/><text text-anchor="middle" y="24">RRF 融合</text></g>
+    <g class="rn" style="--d:1.3s" transform="translate(1020,46)"><circle r="4.5"/><text text-anchor="middle" y="-12">生成</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p293-315</span></footer>
+</section>

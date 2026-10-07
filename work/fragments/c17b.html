@@ -1,0 +1,102 @@
+<!-- ▸ c17b · CH 12 用例:生产力副驾与研究 Agent -->
+<section class="slide" id="c17b" data-part="2" data-crumb="PART II · CH 12" data-title="案例：副驾与研究 Agent">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART II · CH 12</span><span class="dim">书 p231-244</span><span class="tag c">POMDP</span><span class="tag am">GRPO</span></div>
+    <h2 class="k-h">案例：副驾与研究 Agent<span class="en">PRODUCTIVITY COPILOT · RESEARCH AGENT</span></h2>
+    <p class="k-lede">同一配方跑通两个用例：SFT 示范打底，模拟环境中 GRPO 在线强化，执行 reward 与人类反馈共同塑形——生产力副驾与研究 Agent。</p>
+  </header>
+  <div class="s-body">
+    <ul class="k-flow fu" style="--d:.05s">
+      <li>SFT：50K–200K 示范轨迹</li><li>构建模拟沙盒 · 任务课程</li><li>GRPO 在线 RL（N=8/任务）</li><li>内测 1000+ 用户 · DPO 精调</li>
+    </ul>
+    <div class="grid4 fu" style="--d:.12s">
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">01</span>POMDP 形式化</div>
+        <div class="k-card-b">动作=六应用 <span class="cy">JSON API 调用</span>；状态=工作区投影（部分可观测）；γ=0.99 · 10–50 步。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">02</span>多目标 Reward</div>
+        <div class="k-card-b">任务 <span class="am">.40</span>·质量 .25·效率 .15·安全 .15·用户 .05；违规则安全项归零。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">03</span>模拟环境与课程</div>
+        <div class="k-card-b">沙盒合成邮箱·日历·文档；<span class="cy">L1 单步→L5 跨应用</span>，成功率 &gt;70% 晋级。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">04</span>安全护栏 · 信用分配</div>
+        <div class="k-card-b">硬约束（外发·删除·改权限）拒并 <b>−1.0</b>；子目标各 <span class="am">+0.2</span>，失败只罚断裂段。</div>
+      </div>
+    </div>
+    <div class="split-62 fu" style="--d:.2s">
+      <div class="fig">
+        <svg viewBox="0 0 860 280" role="img" aria-label="生产力副驾架构：用户、副驾策略与六应用 API，执行 reward 经 GRPO 回流更新策略">
+          <!-- 用户 -->
+          <g class="pop" style="--d:.25s">
+            <rect x="28" y="86" width="112" height="60" rx="9" fill="var(--ink0)" stroke="var(--cyan)" stroke-width="1.5"/>
+            <text x="84" y="110" text-anchor="middle" style="font-weight:700">用户</text>
+            <text class="mut" x="84" y="129" text-anchor="middle">意图 · 反馈</text>
+          </g>
+          <!-- 副驾 -->
+          <g class="pop" style="--d:.4s">
+            <rect x="228" y="66" width="196" height="100" rx="10" fill="var(--ink0)" stroke="var(--amber)" stroke-width="2"/>
+            <text class="t-strong" x="326" y="92" text-anchor="middle">副驾 Copilot</text>
+            <text x="326" y="114" text-anchor="middle">RL 策略 πθ · LLM</text>
+            <text class="mut" x="326" y="133" text-anchor="middle">思考 CoT + JSON 工具调用</text>
+            <text class="m" x="326" y="152" text-anchor="middle">γ=0.99 · 视野 10–50 步</text>
+          </g>
+          <!-- 应用面板 -->
+          <g class="pop" style="--d:.55s">
+            <rect x="520" y="22" width="312" height="196" rx="10" fill="var(--cyan-bg)" stroke="rgba(78,201,212,.45)" stroke-width="1.5"/>
+            <text x="676" y="46" text-anchor="middle" style="font-weight:700">生产力应用 API</text>
+            <circle cx="540" cy="65.5" r="3" fill="var(--cyan)"/><text x="554" y="70">Outlook · 邮件</text>
+            <circle cx="540" cy="91.5" r="3" fill="var(--cyan)"/><text x="554" y="96">Excel · 表格</text>
+            <circle cx="540" cy="117.5" r="3" fill="var(--cyan)"/><text x="554" y="122">Word · 文档</text>
+            <circle cx="540" cy="143.5" r="3" fill="var(--cyan)"/><text x="554" y="148">PowerPoint · 幻灯</text>
+            <circle cx="540" cy="169.5" r="3" fill="var(--cyan)"/><text x="554" y="174">Teams · 消息</text>
+            <circle cx="540" cy="195.5" r="3" fill="var(--cyan)"/><text x="554" y="200">SharePoint · 存储</text>
+          </g>
+          <!-- 用户 <-> 副驾 -->
+          <line x1="140" y1="104" x2="216" y2="104" stroke="var(--cyan)" stroke-width="1.5"/>
+          <path d="M222,104 l-10,-4.5 v9 z" fill="var(--cyan)"/>
+          <text class="m" x="181" y="95" text-anchor="middle">意图</text>
+          <line x1="216" y1="136" x2="146" y2="136" stroke="var(--cyan)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <path d="M140,136 l10,-4.5 v9 z" fill="var(--cyan)"/>
+          <text class="m" x="181" y="154" text-anchor="middle">预览 · 结果</text>
+          <!-- 副驾 <-> 应用 -->
+          <line class="draw" style="--d:.7s" pathLength="1" x1="424" y1="96" x2="512" y2="96" stroke="var(--cyan)" stroke-width="1.8"/>
+          <path d="M522,96 l-10,-4.5 v9 z" fill="var(--cyan)"/>
+          <text class="m" x="469" y="87" text-anchor="middle">JSON 动作</text>
+          <line x1="514" y1="144" x2="432" y2="144" stroke="var(--cyan)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <path d="M424,144 l10,-4.5 v9 z" fill="var(--cyan)"/>
+          <text class="m" x="469" y="162" text-anchor="middle">观测 · 截断</text>
+          <!-- RL 训练环路 -->
+          <path class="draw" style="--d:.95s" pathLength="1" d="M676,218 L676,246 L330,246 L330,172" fill="none" stroke="var(--verm)" stroke-width="2"/>
+          <path d="M330,166 l-5,10 h10 z" fill="var(--verm)"/>
+          <text class="m" x="503" y="240" text-anchor="middle" fill="var(--verm)">Reward：任务·质量·效率·安全·用户反馈</text>
+          <text class="m" x="503" y="264" text-anchor="middle">GRPO 组归一化（每任务 N=8）更新 πθ</text>
+          <text class="mut" x="60" y="264">训练于模拟沙盒：合成邮箱·日历·文档</text>
+        </svg>
+        <div class="figcap">图 12.2 · 生产力副驾（用例一）：用户意图 → 策略 πθ → 六应用 API；执行 reward 经 GRPO 回流，端到端更新策略</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div class="k-card">
+          <div class="k-card-t"><span class="no">05</span>用例二 · 研究 Agent</div>
+          <div class="k-card-b">GRPO <span class="cy">N=4</span>·γ=1.0；R=质量 .30＋正确 .30＋新颖 .15＋效率 .15＋格式 .10。示例：13 步实验 R=<span class="am">0.875</span>，优势 +1.48。</div>
+        </div>
+        <div class="k-card">
+          <div class="k-card-t"><span class="no">06</span>失败模式与教训</div>
+          <div class="k-card-b">无限循环·调试螺旋·幻觉引用·过早提交·judge hacking；对策：步数预算、重试上限 3、引用验证、轮换 judge。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="118" y="16">SFT 起步</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="298" y="72">模拟沙盒</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="532" y="12">GRPO</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="754" y="62">安全护栏</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="990" y="66">研究Agent</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II 强化学习</span><span class="pg">p231-244</span></footer>
+</section>

@@ -1,0 +1,82 @@
+- generic [active] [ref=f6e1]:
+  - generic: AGENTIC AI · NIGHT CHART
+  - generic: N 31°14′ E 121°29′ · v1.1.0
+  - generic [ref=f6e5]:
+    - generic [ref=f6e6]:
+      - generic [ref=f6e7]:
+        - generic [ref=f6e8]: PART V · CH 16
+        - generic [ref=f6e9]: 书 p293-315
+        - generic [ref=f6e10]: BM25
+        - generic [ref=f6e11]: RRF
+      - heading "检索增强生成:架构与检索SPARSE · DENSE · HYBRID · CHUNKING" [level=2] [ref=f6e12]
+      - paragraph [ref=f6e13]: LLM 把知识压进权重,难逃幻觉、过时、领域盲区。RAG 配上动态可更新的外部记忆——对检索证据边缘化,让响应有据可查、可验证。
+    - generic [ref=f6e14]:
+      - generic [ref=f6e15]:
+        - generic [ref=f6e16]:
+          - generic [ref=f6e17]: 1.2-2.0
+          - generic [ref=f6e18]: BM25 k₁ 取值·b=0.75
+        - generic [ref=f6e19]:
+          - generic [ref=f6e20]: k=60
+          - generic [ref=f6e21]: RRF 平滑常数·按排名融合
+        - generic [ref=f6e22]:
+          - generic [ref=f6e23]: "36.8"
+          - generic [ref=f6e24]: SPLADEv2 MRR@10·v1 为 34.0
+        - generic [ref=f6e25]:
+          - generic [ref=f6e26]: 5-10×
+          - generic [ref=f6e27]: PLAID 索引降低 ColBERT 延迟
+      - generic [ref=f6e28]:
+        - generic [ref=f6e29]:
+          - generic [ref=f6e30]:
+            - generic [ref=f6e31]: 01参数化 vs 非参数化
+            - generic [ref=f6e32]: 知识压进权重,难逃幻觉、过时、领域盲区。RAG 按检索分布 P(d|q) 边缘化证据——给学者发一张「图书证」。
+          - generic [ref=f6e33]:
+            - generic [ref=f6e34]: 02RAG·微调·长上下文选型
+            - generic [ref=f6e35]: 微调教如何推理,RAG 供内容,互补。更新频繁/需引用/专有语料→RAG;风格/新技能/低延迟→微调;装得进窗口→长上下文。
+          - generic [ref=f6e36]:
+            - generic [ref=f6e37]: 03分块策略
+            - generic [ref=f6e38]: 固定重叠 512/64 是默认;语义分块切在相似度谷底;结构分块按标题/函数、表格不拆;父子块:检索 128,回传 512。
+        - generic [ref=f6e39]:
+          - img "端到端 RAG 流水线:文档→分块→嵌入→向量库→检索→重排→生成" [ref=f6e40]:
+            - generic [ref=f6e41]: 离线索引 · OFFLINE · 一次构建
+            - generic [ref=f6e43]: 文档加载
+            - generic [ref=f6e44]: PDF·HTML·MD·元数据
+            - generic [ref=f6e47]: 分块
+            - generic [ref=f6e48]: 512 Token·重叠 64
+            - generic [ref=f6e51]: 嵌入 fϕ
+            - generic [ref=f6e52]: e = fϕ(c)·d 维向量
+            - generic [ref=f6e55]: 向量数据库
+            - generic [ref=f6e56]: 向量+原文+元数据
+            - generic [ref=f6e59]: ANN 近似检索:IVF · HNSW O(log N) · PQ
+            - generic [ref=f6e60]: 在线检索—生成 · ONLINE · 每查询
+            - generic [ref=f6e62]: 查询编码
+            - generic [ref=f6e63]: q = fϕ(q)
+            - generic [ref=f6e66]: 检索 top-k
+            - generic [ref=f6e67]: 余弦相似·取前 k 块
+            - generic [ref=f6e68]: sim = q·e/(∥q∥·∥e∥)
+            - generic [ref=f6e71]: 重排
+            - generic [ref=f6e72]: 交叉编码器精排
+            - generic [ref=f6e75]: 生成 + 引用
+            - generic [ref=f6e76]: 仅凭上下文·[Doc N]
+            - generic [ref=f6e78]: BM25/TF-IDF 稀疏 · DPR 稠密 · RRF 混合 k=60 · SPLADE 学习式稀疏 · ColBERT 晚期交互
+            - generic [ref=f6e79]: DPR 双塔对比学习·SPLADE 以 MLM 头扩展词项·ColBERT MaxSim 晚期交互·RRF 在排名上融合,免分数不可比
+          - generic [ref=f6e80]: 图 16.1 · 端到端 RAG:离线管道一次建索引,在线管道逐查询检索—重排—生成
+      - generic [ref=f6e81]: 最佳实践分块得当的朴素 RAG 往往胜过分块糟糕的复杂系统;先修好检索,再优化生成;top-20 交叉编码器重排 ROI 最高。
+    - img [ref=f6e83]:
+      - generic [ref=f6e85]: 分块
+      - generic [ref=f6e88]: 嵌入
+      - generic [ref=f6e91]: 检索
+      - generic [ref=f6e94]: RRF 融合
+      - generic [ref=f6e97]: 生成
+    - generic [ref=f6e100]:
+      - generic [ref=f6e101]: 《Agentic AI 指南》中文版 v1.1.0
+      - generic [ref=f6e102]: ·
+      - generic [ref=f6e103]: Part V 智能体
+      - generic [ref=f6e104]: p293-315
+  - generic [ref=f6e105]: PART V · CH 16 · RAG:架构与检索
+  - generic [ref=f6e106]: ← → 翻页 · T 目录 · F 全屏
+  - generic [ref=f6e107]:
+    - generic [ref=f6e108]: 01 / 01
+    - generic [ref=f6e109] [cursor=pointer]: 目录
+    - generic [ref=f6e110] [cursor=pointer]: 全屏
+  - generic [aria-hidden] [ref=f6e112] [cursor=pointer]
+  - generic [aria-hidden] [ref=f6e113] [cursor=pointer]

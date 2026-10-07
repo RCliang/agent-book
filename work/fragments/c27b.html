@@ -1,0 +1,60 @@
+<!-- ▸ c27b · Ch22 MCP:安全·生态·训练 -->
+<section class="slide" id="c27b" data-part="5" data-crumb="PART V · CH 22" data-title="MCP:安全·生态·训练">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 22</span><span class="dim">书 p406-416</span><span class="tag c">FastMCP</span><span class="tag c">OAuth 2.0</span></div>
+    <h2 class="k-h">MCP:安全·生态·训练<span class="en">SECURITY · ECOSYSTEM · RL &amp; SFT</span></h2>
+    <p class="k-lede">MCP 运行在分层信任之上:Host 执行同意,Server 条件信任。对训练者,它更是标准化的动作空间与轨迹来源——LLM 时代的 gymnasium。</p>
+  </header>
+  <div class="s-body">
+    <div class="row fu" style="--d:.05s">
+      <div class="k-num"><b>4 层</b><span>信任 Host&gt;Client&gt;Server&gt;外部</span></div>
+      <div class="k-num c"><b>10</b><span>表 22.1 代表性官方 Server</span></div>
+      <div class="k-num v"><b>2^n</b><span>重连退避 wait=base·2^attempt</span></div>
+      <div class="k-num"><b>0.8</b><span>工具结果可编码 reward 信号</span></div>
+    </div>
+    <div class="grid3 fu" style="--d:.1s">
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">01</span>信任层级·用户同意</div>
+        <div class="k-card-b">Host 最高信任并执行<b>用户同意</b>;Server 条件信任,resource 可夹带注入;凭据走 <span class="cy">OAuth 2.0</span> 与密钥管理,最小权限。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">02</span>最小 Server·多连接</div>
+        <div class="k-card-b">FastMCP 由类型注解+docstring 自动生成 schema;多 Server 用<span class="cy">连接池</span>统一注册路由;崩溃后按 2^n 退避重连。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">03</span>训练:动作空间与轨迹</div>
+        <div class="k-card-b">tools/list 即动作空间,resources 即观测,工具结果可携带 reward;轨迹记录中间件一键转成 <span class="cy">chat 格式 SFT 样本</span>。</div>
+      </div>
+    </div>
+    <div class="split-62 fu" style="--d:.2s">
+      <table class="k-table">
+        <thead><tr><th>场景</th><th>选 MCP</th><th>选自定义集成</th></tr></thead>
+        <tbody>
+          <tr><td>多厂商 / 多框架协同</td><td><span class="cy">一次实现,跨厂商即插</span></td><td>锁定单一提供方</td></tr>
+          <tr><td>工具分发给他人使用</td><td>开放标准 + 生态注册表</td><td>自建分发与维护</td></tr>
+          <tr><td>需会话·订阅·推送</td><td><span class="cy">协议原生支持</span></td><td>需自行实现</td></tr>
+          <tr><td>延迟敏感·接口特殊</td><td>协议开销难承受</td><td><span class="am">直连更快更省</span></td></tr>
+        </tbody>
+      </table>
+      <div class="col">
+        <div class="k-code"><pre><span class="k">@mcp.tool</span>()
+<span class="k">def</span> <span class="f">create_note</span>(title: str, content: str) -&gt; str: ...
+<span class="c"># inputSchema 由注解+docstring 生成 · mcp.run() 自选传输</span></pre></div>
+        <div class="k-card">
+          <div class="k-card-t">生态与注册表</div>
+          <div class="k-card-b">官方 <span class="cy">MCP Registry</span> 精选 + npm/PyPI 分发;Claude Desktop、Cursor、VS Code Copilot 均已原生接入。</div>
+        </div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>头号攻击面</b>经 Resource 的 prompt 注入:上下文里的「忽略此前指令」可能被执行——数据标记为不可信,破坏性操作强制用户确认。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text text-anchor="middle" x="150" y="14">信任层级</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text text-anchor="middle" x="330" y="72">用户同意</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text text-anchor="middle" x="560" y="12">FastMCP</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text text-anchor="middle" x="790" y="62">生态</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text text-anchor="middle" x="1020" y="30">SFT 轨迹</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p406-416</span></footer>
+</section>

@@ -1,0 +1,62 @@
+<!-- ▸ c19b · LLM-as-Judge 与评估陷阱(第 14 章下) -->
+<section class="slide" id="c19b" data-part="4" data-crumb="PART IV · CH 14" data-title="LLM-as-Judge 与陷阱">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART IV · CH 14</span><span class="dim">书 p284-288</span><span class="tag c">G-Eval</span><span class="tag c">BIAS</span></div>
+    <h2 class="k-h">LLM-as-Judge 与评估陷阱<span class="en">JUDGE · POSITION BIAS · G-EVAL · PITFALLS</span></h2>
+    <p class="k-lede">评估本身也是语言任务:强模型当裁判可规模化,却自带位置与冗长偏置。交换顺序、面板投票、概率加权可校正;污染与 Goodhart 仍在腐蚀评估。</p>
+  </header>
+  <div class="s-body">
+    <div class="grid3">
+      <div class="k-card fu" style="--d:.05s">
+        <div class="k-card-t"><span class="no">01</span>三种评判格式</div>
+        <div class="k-card-b">点评式:按有用·准确·清晰打 1–10 分,先理由后分数;成对:恰好输出 [[A]]/[[B]]/[[C]];参考引导:附参考答案,适合事实型。</div>
+      </div>
+      <div class="k-card fu" style="--d:.12s">
+        <div class="k-card-t"><span class="no">02</span>位置偏置与缓解</div>
+        <div class="k-card-b">系统性偏好首位/末位,可达 10–15 个百分点;冗长偏置同理。交换 A/B 顺序评判:一致才采纳、否则记平局,辅以集成与强制 CoT。</div>
+      </div>
+      <div class="k-card fu" style="--d:.19s">
+        <div class="k-card-t"><span class="no">03</span>多评判者面板</div>
+        <div class="k-card-b">跨模型家族 J 位裁判多数投票。三人面板:全体一致=高置信,2–1 分裂=中置信,三方平局=低置信。</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <table class="k-table fu" style="--d:.26s">
+        <thead><tr><th>指标</th><th>验证评判者是否可靠</th></tr></thead>
+        <tbody>
+          <tr><td>一致率</td><td>与人类标注一致的样本比例</td></tr>
+          <tr><td>Cohen's κ</td><td>偶然修正一致率;κ&gt;0.6 且一致率&gt;80% 即可靠</td></tr>
+          <tr><td>Spearman ρ · Kendall τ</td><td>与人类分数的秩相关,适合序数评分;τ 对平局更鲁棒</td></tr>
+        </tbody>
+      </table>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">04</span>G-Eval:概率加权评分</div>
+        <div class="k-card-b">先 CoT 生成评估步骤;对 1–5 各分值读 logP(s),概率加权取期望并归一化 [0,1]——保留不确定性,相关性优于直接提示。</div>
+      </div>
+    </div>
+    <div class="grid3 fu" style="--d:.32s">
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">05</span>基准污染</div>
+        <div class="k-card-b">评估数据混入训练集即分数虚高。检测:n-gram 重叠、成员推断、金丝雀串、时间留出;缓解:私有测试集+定期刷新。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">06</span>对基准过拟合</div>
+        <div class="k-card-b">反复评估与调参泄漏基准信息(自适应过拟合);MMLU 已近饱和——新基准只是临时信号,非永久金标准。</div>
+      </div>
+      <div class="k-card">
+        <div class="k-card-t"><span class="no">07</span>其他陷阱</div>
+        <div class="k-card-b">Prompt 敏感性、聚合伪影、标注者选择偏差、评估—部署失配:基准干净,生产嘈杂多轮即退化。</div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.4s"><b>Goodhart 定律</b>「当一个度量成为目标,它就不再是好的度量」——Reward 欺骗、指标博弈、评判者博弈皆是化身;以指标多样化与留出评估抵御。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="116" y="16">评判格式</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">位置偏置</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="530" y="12">评判面板</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="764" y="62">G-Eval</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="986" y="66">Goodhart</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part IV 评估</span><span class="pg">p284-288</span></footer>
+</section>

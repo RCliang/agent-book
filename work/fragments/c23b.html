@@ -1,0 +1,68 @@
+<!-- ▸ c23b · CH 18 编排与生产 -->
+<section class="slide" id="c23b" data-part="5" data-crumb="PART V · CH 18" data-title="编排与生产">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 18</span><span class="dim">书 p350-356</span><span class="tag c">ReAct</span><span class="tag c">LangGraph</span></div>
+    <h2 class="k-h">编排与生产<span class="en">ORCHESTRATION · STATE · PRODUCTION</span></h2>
+    <p class="k-lede">编排决定 Agent 如何决定下一步:探索用 ReAct,结构化用 Plan-and-Execute,可分解用多 Agent;生产系统还需管好状态、错误、延迟与成本。</p>
+  </header>
+  <div class="s-body">
+    <div class="grid4">
+      <div class="k-card fu" style="--d:.05s">
+        <div class="k-card-t"><span class="no">01</span>ReAct 循环</div>
+        <div class="k-card-b">Thought→Act→Observe 紧凑循环;CoT scratchpad 不展示给用户;最大迭代守卫防死循环,以 Final Answer 或停止符终止。</div>
+      </div>
+      <div class="k-card fu" style="--d:.12s">
+        <div class="k-card-t"><span class="no">02</span>Plan-and-Execute</div>
+        <div class="k-card-b">先生成带依赖的完整计划再逐步执行,子任务可用更便宜模型;长时程任务调用更少,但对意外观察适应性差,失败即重规划。</div>
+      </div>
+      <div class="k-card fu" style="--d:.19s">
+        <div class="k-card-t"><span class="no">03</span>多 Agent 编排</div>
+        <div class="k-card-b">Supervisor 中央路由与聚合;P2P 直接通信但难调试;树状递归分解;Swarm 以 handoff 连同完整上下文交接控制权。</div>
+      </div>
+      <div class="k-card fu" style="--d:.26s">
+        <div class="k-card-t"><span class="no">04</span>人机协同 HITL</div>
+        <div class="k-card-b">不可逆操作(发邮件·删文件·付款)前设审批门;低置信、越界、超预算即升级(式 18.12);人类更正回注 Context。</div>
+      </div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s">
+          <div class="k-card-t"><span class="no">05</span>状态管理</div>
+          <div class="k-card-b">对话·任务·Agent·持久化四层;检查点供失败恢复、可回滚最近 k 步。把状态当数据库 schema:提前谨慎设计。</div>
+        </div>
+        <div class="k-card fu" style="--d:.22s">
+          <div class="k-card-t"><span class="no">06</span>错误与可观测</div>
+          <div class="k-card-b">指数退避 min(2^k·t0+抖动, tmax);对 (tool,args) 哈希去重检测循环;Trace·Log·Metric 三件套,投入 replay 回放。</div>
+        </div>
+        <div class="k-card fu" style="--d:.29s">
+          <div class="k-card-t"><span class="no">07</span>生产关注点</div>
+          <div class="k-card-b">并行工具+流式降首字延迟;Prompt 缓存省 50-90%;模型路由控成本;Token 桶限流+反压 503;A/B·灰度·Shadow·LLM 评审。</div>
+        </div>
+      </div>
+      <div class="col">
+        <table class="k-table fu" style="--d:.2s">
+          <thead><tr><th>框架</th><th>灵活</th><th>复杂</th><th>生产</th><th>多Agent</th><th>最适合</th></tr></thead>
+          <tbody>
+            <tr><td>LangChain</td><td>H</td><td>H</td><td>M</td><td>M</td><td>快速原型·链式</td></tr>
+            <tr><td>LangGraph</td><td>H</td><td>H</td><td>H</td><td>H</td><td>复杂有状态工作流</td></tr>
+            <tr><td>AutoGen</td><td>M</td><td>M</td><td>M</td><td>H</td><td>多 Agent 对话</td></tr>
+            <tr><td>CrewAI</td><td>M</td><td>L</td><td>M</td><td>H</td><td>角色制团队</td></tr>
+            <tr><td>OAI Assistants</td><td>L</td><td>L</td><td>H</td><td>L</td><td>托管 Agent</td></tr>
+            <tr><td>OAI Swarm</td><td>M</td><td>L</td><td>L</td><td>H</td><td>Handoff 演示</td></tr>
+            <tr><td>自研 Custom</td><td>H</td><td>H</td><td>H</td><td>H</td><td>完全控制·无锁定</td></tr>
+          </tbody>
+        </table>
+        <div class="k-callout fu" style="--d:.34s"><b>表 18.1 选型</b>原型期用框架;有严格延迟/成本要求、抽象泄漏致 bug、需细粒度 Context 管控或 harness 即壁垒时自研。</div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="133" y="16">ReAct</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="304" y="72">计划执行</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="534" y="12">多 Agent</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="770" y="62">审批门</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="994" y="66">生产评测</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p350-356</span></footer>
+</section>

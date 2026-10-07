@@ -1,0 +1,80 @@
+<!-- ▸ c32b · 生成式 UI 与人机协同(书 p502-508) -->
+<section class="slide" id="c32b" data-part="5" data-crumb="PART V · CH 27" data-title="生成式 UI 与人机协同">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 27</span><span class="dim">书 p502-508</span><span class="tag c">RSC</span><span class="tag c">HITL</span></div>
+    <h2 class="k-h">生成式 UI 与人机协同<span class="en">GENERATIVE UI · STREAMING · TRUST</span></h2>
+    <p class="k-lede">模型不仅决定说什么,还决定如何呈现:工具调用直接渲染为界面组件。流式是基线,审批门控必须分层,信任则是涌现的属性——北极星是「透明协作者」。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.05s">
+          <div class="k-card-t"><span class="no">01</span>生成式 UI · RSC</div>
+          <div class="k-card-b">工具调用渲染为 React Server Component 流式注入;模型按内容类型从精选、可访问、安全的组件库中选择。</div>
+        </div>
+        <div class="k-card fu" style="--d:.13s">
+          <div class="k-card-t"><span class="no">02</span>流式与实时</div>
+          <div class="k-card-b">Token / 工具调用 / 多 Agent 三种流,SSE 主导;背压:50-100ms 批量、10Hz 节流;操作乐观更新。</div>
+        </div>
+        <div class="k-card fu" style="--d:.21s">
+          <div class="k-card-t"><span class="no">03</span>人机协同 · HITL</div>
+          <div class="k-card-b">打断五判据:可逆性·影响范围·置信度·成本·新颖性;内联纠正与偏好选择既是反馈,也是教学信号。</div>
+        </div>
+      </div>
+      <div class="fig fu" style="--d:.16s">
+        <svg viewBox="0 0 860 280" role="img" aria-label="RSC 生成式 UI 流水线与按内容类型自适应的组件映射">
+          <rect x="36" y="26" width="112" height="46" rx="6" fill="rgba(78,201,212,.08)" stroke="rgba(78,201,212,.45)"/>
+          <text x="92" y="53" text-anchor="middle" style="font-weight:700">用户消息</text>
+          <line x1="152" y1="49" x2="182" y2="49" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="192,49 182,44 182,54" fill="var(--cyan)"/>
+          <rect x="192" y="26" width="160" height="46" rx="6" fill="rgba(78,201,212,.08)" stroke="rgba(78,201,212,.45)"/>
+          <text x="272" y="46" text-anchor="middle" style="font-weight:700">Server Action</text>
+          <text class="mut" x="272" y="64" text-anchor="middle" style="font-size:12px">streamUI() + 工具集</text>
+          <line x1="356" y1="49" x2="386" y2="49" stroke="var(--cyan)" stroke-width="1.5"/>
+          <polygon points="396,49 386,44 386,54" fill="var(--cyan)"/>
+          <rect class="pop" style="--d:.35s" x="396" y="26" width="168" height="46" rx="6" fill="rgba(78,201,212,.08)" stroke="rgba(78,201,212,.45)"/>
+          <text x="480" y="46" text-anchor="middle" style="font-weight:700">LLM · 工具调用</text>
+          <text class="mut" x="480" y="64" text-anchor="middle" style="font-size:12px">show_weather(location)</text>
+          <line class="draw" style="--d:.5s" pathLength="1" x1="568" y1="49" x2="598" y2="49" stroke="var(--verm)" stroke-width="2"/>
+          <polygon points="608,49 598,44 598,54" fill="var(--verm)"/>
+          <rect class="pop" style="--d:.65s" x="608" y="26" width="216" height="46" rx="6" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.5"/>
+          <text x="716" y="46" text-anchor="middle" fill="var(--amber)" style="font-weight:700">WeatherCard 组件</text>
+          <text class="mut" x="716" y="64" text-anchor="middle" style="font-size:12px">RSC 流式注入聊天流</text>
+          <line x1="36" y1="96" x2="824" y2="96" stroke="var(--line)" stroke-width="1"/>
+          <text x="36" y="124" style="font-weight:700">按内容类型自适应</text>
+          <text class="mut" x="196" y="124" style="font-size:12px">模型作为 UI 编排者(UI orchestrator)选择呈现形式</text>
+          <text x="60" y="166"><tspan fill="var(--faint)">表格数据</tspan><tspan fill="var(--cyan)"> → </tspan>可排序、可过滤的数据表</text>
+          <text x="350" y="166"><tspan fill="var(--faint)">地理数据</tspan><tspan fill="var(--cyan)"> → </tspan>带标记图层的交互地图</text>
+          <text x="620" y="166"><tspan fill="var(--faint)">时间序列</tspan><tspan fill="var(--cyan)"> → </tspan>可缩放折线图</text>
+          <text x="60" y="214"><tspan fill="var(--faint)">代码</tspan><tspan fill="var(--cyan)"> → </tspan>语法高亮 + 运行按钮编辑器</text>
+          <text x="350" y="214"><tspan fill="var(--faint)">文档</tspan><tspan fill="var(--cyan)"> → </tspan>注释式文档查看器</text>
+          <text x="620" y="214"><tspan fill="var(--faint)">表单</tspan><tspan fill="var(--cyan)"> → </tspan>动态生成表单字段</text>
+        </svg>
+        <div class="figcap">图 27.2 · RSC 生成式 UI:工具输出作为 props 渲染组件并流式注入聊天;模型从预构建组件库中选择,而非生成任意 HTML</div>
+      </div>
+    </div>
+    <div class="grid2 fu" style="--d:.3s">
+      <table class="k-table">
+        <thead><tr><th>层级</th><th>策略</th><th>示例</th></tr></thead>
+        <tbody>
+          <tr><td>Tier 1 自动批准</td><td>低风险·可逆·例行,记录备审计</td><td>网页搜索、读取文件</td></tr>
+          <tr><td>Tier 2 通知</td><td>非阻塞通知,短窗口(30 秒)内可取消</td><td>向草稿箱发送草稿邮件</td></tr>
+          <tr><td>Tier 3 要求批准</td><td>阻塞门控:批准 / 拒绝 / 修改</td><td>发邮件、采购等不可逆操作</td></tr>
+        </tbody>
+      </table>
+      <div>
+        <div class="k-callout"><b>信任设计</b>信任是涌现属性:持续按预期行事、清晰自我解释、从失败中优雅恢复;北极星——「透明协作者」。</div>
+        <div><span class="k-tag">解释决策</span> <span class="k-tag cy">校准置信度</span> <span class="k-tag">撤销回滚</span> <span class="k-tag cy">审计轨迹</span> <span class="k-tag am">管理期望</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 320,72 480,44 S800,12 1140,44"/>
+    <g class="rn" style="--d:.25s"><circle cx="160" cy="34" r="4.5"/><text x="132" y="21">生成式UI</text></g>
+    <g class="rn" style="--d:.5s"><circle cx="384" cy="52" r="4.5"/><text x="360" y="72">流式基线</text></g>
+    <g class="rn" style="--d:.75s"><circle cx="626" cy="24" r="4.5"/><text x="602" y="12">乐观更新</text></g>
+    <g class="rn" style="--d:1s"><circle cx="847" cy="23" r="4.5"/><text x="823" y="45">分层审批</text></g>
+    <g class="rn" style="--d:1.2s"><circle cx="1000" cy="32" r="4.5"/><text x="976" y="18">信任涌现</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V</span><span class="pg">p502-508</span></footer>
+</section>

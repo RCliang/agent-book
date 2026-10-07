@@ -1,0 +1,50 @@
+<!-- ▸ c12code · 代码实战:GRPO TRL 配置 -->
+<section class="slide" id="c12code" data-part="2" data-crumb="PART II · 代码 07" data-title="GRPO TRL 配置">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">7.3 TRL 实现 · 书 p159-160</span><span class="tag c">Python</span><span class="tag c">trl · vLLM</span></div>
+    <h2 class="k-h">一个 GRPOConfig 展开整个组<span class="en">G=8 · TEMPERATURE 1.0 · REWARD FUNCS</span></h2>
+    <p class="k-lede">书 7.3 最小可运行示例:每条 prompt 采 8 条响应、组统计量当 baseline,critic 从显存中消失;reward 就是一个普通 Python 函数。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">from</span> trl <span class="k">import</span> GRPOConfig, GRPOTrainer
+model = AutoModelForCausalLM.<span class="f">from_pretrained</span>(
+    <span class="s">"Qwen/Qwen2.5-7B-Instruct"</span>, torch_dtype=torch.bfloat16,
+    attn_implementation=<span class="s">"flash_attention_2"</span>)
+grpo_config = <span class="f">GRPOConfig</span>(
+    num_generations=8, temperature=1.0,   <span class="c">① G=8 · 高温保组内多样</span>
+    max_completion_length=2048, beta=0.04, <span class="c">③ KL 惩罚系数</span>
+    learning_rate=1e-6,
+    per_device_train_batch_size=2,        <span class="c">② 每设备 2 prompt ×8 = 16 响应</span>
+    use_vllm=True)                        <span class="c">④ 8 倍生成,速度至关重要</span>
+
+<span class="k">def</span> <span class="f">reward_fn</span>(completions, prompts, **kwargs):  <span class="c">⑤ Python 函数即 reward</span>
+    <span class="s">"""返回 float 列表:正确为 1.0,错误为 0.0。"""</span>
+    rewards = []
+    <span class="k">for</span> completion, prompt <span class="k">in</span> <span class="f">zip</span>(completions, prompts):
+        answer, expected = <span class="f">extract_answer</span>(completion), <span class="f">get_ground_truth</span>(prompt)
+        rewards.<span class="f">append</span>(1.0 <span class="k">if</span> answer == expected <span class="k">else</span> 0.0)
+    <span class="k">return</span> rewards
+
+trainer = <span class="f">GRPOTrainer</span>(model=model, args=grpo_config,
+    reward_funcs=[reward_fn, format_reward_fn],  <span class="c">⑤ 可组合多个,多目标</span>
+    train_dataset=math_dataset, tokenizer=tokenizer)
+trainer.<span class="f">train</span>()</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①②</span>配置如何展开一个组</div><div class="k-card-b">每条 prompt 采 G=8 条响应,每设备 2×8=16 条进 batch;组均值当 baseline,critic 从显存消失。全对/全错则 advantage 全 0——温度 1.0 就是为组内留差异。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">③</span>β=0.04:KL 只当护栏</div><div class="k-card-b">KL 项是防模式坍塌的主要多样性机制,不是学习信号本体——信号来自组内归一化 advantage,所以这个系数默认设得很小。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">④</span>生成是开销大头</div><div class="k-card-b">GRPO 每步要为每条 prompt 生成 8 倍响应,速度至关重要;use_vllm 把生成引擎换成 vLLM(书中配 0.7 的显存占用),训练才跑得动。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">⑤</span>签名决定接入方式</div><div class="k-card-b">reward 函数收 (completions, prompts, **kwargs)、返回 float 列表;reward_funcs 可并列多个(正确性+格式),多目标各算各的、直接相加。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>pip install trl · 一行启动:trainer.train();预期:日志 reward 均值逐步上升——组内高于均值的响应 advantage 为正、低于均值为负。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="124" y="16">G=8 组采样</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="366" y="70">τ=1.0 多样</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="28" r="4.5"/><text x="602" y="12">β=0.04 KL</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="844" y="64">reward 函数</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part II 对齐 · 代码</span><span class="pg">p159-160</span></footer>
+</section>

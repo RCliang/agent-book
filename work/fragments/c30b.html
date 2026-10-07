@@ -1,0 +1,108 @@
+<!-- ▸ c30b · 多智能体:模式·RL·应用 -->
+<section class="slide" id="c30b" data-part="5" data-crumb="PART V · CH 25" data-title="多智能体:模式·RL·应用">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 25</span><span class="dim">书 p453-462</span><span class="tag c">Debate</span><span class="tag c">CTDE</span></div>
+    <h2 class="k-h">多智能体:模式与训练<span class="en">PATTERNS · MULTI-AGENT RL · PRACTICE</span></h2>
+    <p class="k-lede">拓扑之上是交互模式:辩论、反思、流水线等七种模式组装 LLM 团队;RL 训练引入非平稳性,CTDE 是合作场景的最佳实践;协调有代价,安全须显式设计。</p>
+  </header>
+  <div class="s-body">
+    <div class="grid4">
+      <div class="k-card fu" style="--d:.05s">
+        <div class="k-card-t"><span class="no">01</span>辩论 · 集成</div>
+        <div class="k-card-b">立场互辩,裁判裁决;独立求解取 <span class="cy">best-of-N</span>,以算力换可靠。</div>
+      </div>
+      <div class="k-card fu" style="--d:.11s">
+        <div class="k-card-t"><span class="no">02</span>反思 · 师生</div>
+        <div class="k-card-b">生成—批判—修订循环;强 Agent 引导弱 Agent。</div>
+      </div>
+      <div class="k-card fu" style="--d:.17s">
+        <div class="k-card-t"><span class="no">03</span>分工 · 流水线</div>
+        <div class="k-card-b">独立子任务并行聚合;顺序链处理依赖任务。</div>
+      </div>
+      <div class="k-card fu" style="--d:.23s">
+        <div class="k-card-t"><span class="no">04</span>红队</div>
+        <div class="k-card-b"><b class="hl">对抗式</b>找弱点与违规,安全关键必备。</div>
+      </div>
+    </div>
+    <div class="split-38">
+      <div class="col">
+        <table class="k-table fu" style="--d:.12s">
+          <thead><tr><th>多 Agent RL</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td>独立学习</td><td>视他为环境,非平稳易震荡</td></tr>
+            <tr><td><b>CTDE</b></td><td>集中 critic 训练·去中心执行(主流)</td></tr>
+            <tr><td>通信学习</td><td>可微消息向量,端到端优化</td></tr>
+            <tr><td>涌现通信</td><td>自发符号协议,可解释性差</td></tr>
+            <tr><td>自博弈</td><td>对手是过去的自己,自动课程</td></tr>
+            <tr><td>种群 PBT</td><td>多样种群,劣者被变异替换</td></tr>
+            <tr><td>Nash 均衡</td><td>单方偏离无法提高回报</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fig fu" style="--d:.18s">
+        <svg viewBox="0 0 860 230" role="img" aria-label="CTDE:集中训练、去中心化执行">
+          <line x1="430" y1="18" x2="430" y2="198" stroke="var(--line)" stroke-dasharray="3 5"/>
+          <text x="220" y="30" text-anchor="middle" style="font-weight:700">训练 · 集中式 critic</text>
+          <rect class="pop" style="--d:.35s" x="130" y="48" width="180" height="40" rx="8" fill="var(--cyan-bg)" stroke="var(--cyan)" stroke-width="1.5"/>
+          <text x="220" y="73" text-anchor="middle">critic Qᵢ(s, a)</text>
+          <g class="draw" style="--d:.2s">
+            <line x1="165" y1="88" x2="112" y2="146" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="220" y1="88" x2="220" y2="146" stroke="var(--amber)" stroke-width="1.5"/>
+            <line x1="275" y1="88" x2="328" y2="146" stroke="var(--amber)" stroke-width="1.5"/>
+          </g>
+          <circle cx="110" cy="158" r="13" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <circle cx="220" cy="158" r="13" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <circle cx="330" cy="158" r="13" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <text class="m" x="110" y="163" text-anchor="middle">π₁</text>
+          <text class="m" x="220" y="163" text-anchor="middle">π₂</text>
+          <text class="m" x="330" y="163" text-anchor="middle">π₃</text>
+          <text class="mut" x="220" y="192" text-anchor="middle">critic 看全局状态 s 与联合动作 a</text>
+          <text x="640" y="30" text-anchor="middle" style="font-weight:700">执行 · 去中心化</text>
+          <g class="draw" style="--d:.5s">
+            <line x1="530" y1="110" x2="530" y2="140" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="640" y1="110" x2="640" y2="140" stroke="var(--cyan)" stroke-width="1.5"/>
+            <line x1="750" y1="110" x2="750" y2="140" stroke="var(--cyan)" stroke-width="1.5"/>
+            <path d="M526,140 L530,148 L534,140 Z" fill="var(--cyan)"/>
+            <path d="M636,140 L640,148 L644,140 Z" fill="var(--cyan)"/>
+            <path d="M746,140 L750,148 L754,140 Z" fill="var(--cyan)"/>
+          </g>
+          <text class="m" x="530" y="102" text-anchor="middle">o₁</text>
+          <text class="m" x="640" y="102" text-anchor="middle">o₂</text>
+          <text class="m" x="750" y="102" text-anchor="middle">o₃</text>
+          <circle cx="530" cy="158" r="13" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <circle cx="640" cy="158" r="13" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <circle cx="750" cy="158" r="13" fill="var(--ink0)" stroke="var(--amber)" stroke-width="1.8"/>
+          <text class="m" x="530" y="163" text-anchor="middle">π₁</text>
+          <text class="m" x="640" y="163" text-anchor="middle">π₂</text>
+          <text class="m" x="750" y="163" text-anchor="middle">π₃</text>
+          <line x1="548" y1="158" x2="622" y2="158" stroke="var(--verm)" stroke-width="1.2" stroke-dasharray="4 4" opacity=".7"/>
+          <path d="M581,154 L589,162 M589,154 L581,162" stroke="var(--verm)" stroke-width="1.5"/>
+          <line x1="658" y1="158" x2="732" y2="158" stroke="var(--verm)" stroke-width="1.2" stroke-dasharray="4 4" opacity=".7"/>
+          <path d="M691,154 L699,162 M699,154 L691,162" stroke="var(--verm)" stroke-width="1.5"/>
+          <text class="mut" x="640" y="192" text-anchor="middle">仅凭局部观测 oᵢ 行动,无需通信</text>
+          <text class="m" x="430" y="216" text-anchor="middle" fill="var(--cyan)">∇θᵢ Jᵢ = E[∇θᵢ log πᵢ(aᵢ|oᵢ) · Qᵢφ(s, a)] —— 式 25.9</text>
+        </svg>
+        <div class="figcap">图 25.5 · CTDE:训练看全局、执行凭局部——集中式 critic 化解非平稳性(p455)</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="k-card fu" style="--d:.26s">
+        <div class="k-card-t"><span class="no">05</span>挑战与安全</div>
+        <div class="k-card-b">每条消息耗 Token:<b>Δv＞成本才通信</b>;查重防冗余;反事实归因;O(n²)→稀疏图;涌现是双刃剑,需安全监控 Agent。</div>
+      </div>
+      <div class="k-card fu" style="--d:.32s">
+        <div class="k-card-t"><span class="no">06</span>现实应用</div>
+        <div class="k-card-b">软件:架构→编码→测试→评审;研究:综述→假设→实验→写作;客服:分诊→专员→升级;创意:风暴→草稿→编辑。</div>
+      </div>
+    </div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="132" y="16">七模式</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="308" y="72">CTDE</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="548" y="12">挑战</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="778" y="62">应用</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="1008" y="66">从简</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p443-462</span></footer>
+</section>

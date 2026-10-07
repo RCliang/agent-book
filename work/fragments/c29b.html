@@ -1,0 +1,55 @@
+<!-- ▸ c29b · A2A:协调、发现与安全(书 p426-436) -->
+<section class="slide" id="c29b" data-part="5" data-crumb="PART V · CH 24" data-title="A2A:协调·安全·MCP">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag">PART V · CH 24</span><span class="dim">书 p426-436</span><span class="tag c">7 种模式</span><span class="tag c">MCP</span></div>
+    <h2 class="k-h">A2A:协调、发现与安全<span class="en">PATTERNS · CNP · A2A × MCP</span></h2>
+    <p class="k-lede">从请求-响应到合同网与拍卖,A2A 提供一整套通信与协调语汇;它与 MCP <b>纵横互补</b>——MCP 纵向连工具,A2A 横向连 Agent,生产系统两者并用。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-38">
+      <div class="col">
+        <div class="k-card fu" style="--d:.05s">
+          <div class="k-card-t"><span class="no">01</span>通信模式全景</div>
+          <div class="k-card-b">七种:请求-响应·流式·多轮·广播·pub-sub·协商·拍卖,按延迟与任务复杂度选;流式让审阅与生成并行,总延迟降 <b>40-60%</b>。</div>
+        </div>
+        <div class="k-card fu" style="--d:.13s">
+          <div class="k-card-t"><span class="no">02</span>发现与路由</div>
+          <div class="k-card-b">注册中心:中心化简单但单点,联合更韧性、宜跨组织;按能力语义匹配 <span class="cy">Agent Card</span> 路由;均衡:轮询/最少负载/延迟感知/亲和;语义化版本防偏斜。</div>
+        </div>
+        <div class="k-card fu" style="--d:.21s">
+          <div class="k-card-t"><span class="no">03</span>协调协议</div>
+          <div class="k-card-b">合同网:宣告→竞标→授标→汇报;黑板:共享工作区、机会主义求解;共识:多数/加权/法定人数/德尔菲;<span class="cy">领导者选举</span>应对编排器失效。</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="fu" style="--d:.2s">
+          <table class="k-table">
+            <thead><tr><th>维度</th><th>MCP(纵向)</th><th>A2A(横向)</th></tr></thead>
+            <tbody>
+              <tr><td>参与方</td><td>Agent ↔ 工具/资源</td><td>Agent ↔ Agent</td></tr>
+              <tr><td>智能性</td><td>仅 Agent 端推理</td><td>双方均能推理规划</td></tr>
+              <tr><td>状态性</td><td>无状态 Tool 调用</td><td>带生命周期的任务</td></tr>
+              <tr><td>流式传输</td><td>有限(Tool 结果)</td><td>一等 SSE 流式</td></tr>
+              <tr><td>发现机制</td><td>Tool 清单</td><td>Agent Card</td></tr>
+              <tr><td>典型用例</td><td>查库·运行 SQL</td><td>委派给专家 Agent</td></tr>
+            </tbody>
+          </table>
+          <p class="k-quote">MCP 纵向连工具与数据源,A2A 横向连 Agent——互补而非竞争<span class="k-cite">— 书 p433</span></p>
+          <ul class="k-flow">
+            <li>编排 Agent</li><li>A2A 委派</li><li>专家 Agent</li><li>MCP 连自有工具</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="k-callout fu" style="--d:.34s"><b>安全四层</b>身份验证(JWT/mTLS/DID)·TLS 1.3+JWS 签名不可否认·OAuth scope 授权边界·审计轨迹——委派链中每次交互都可追责。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="150" cy="30" r="4.5"/><text x="120" y="16">通信模式</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="330" cy="52" r="4.5"/><text x="300" y="72">发现路由</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="560" cy="26" r="4.5"/><text x="530" y="12">协调协议</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="790" cy="42" r="4.5"/><text x="758" y="62">vs MCP</text></g>
+    <g class="rn" style="--d:1.3s"><circle cx="1020" cy="46" r="4.5"/><text x="990" y="66">安全审计</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体</span><span class="pg">p426-436</span></footer>
+</section>

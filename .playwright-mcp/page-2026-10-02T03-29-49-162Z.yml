@@ -1,0 +1,255 @@
+- generic [active] [ref=f1e1]:
+  - generic: AGENTIC AI · NIGHT CHART
+  - generic: N 31°14′ E 121°29′ · v1.1.0
+  - generic [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - generic [ref=f1e7]:
+          - generic [ref=f1e8]: PART V · CH 21
+          - generic [ref=f1e9]: 书 p383-397
+          - generic [ref=f1e10]: Gymnasium
+          - generic [ref=f1e11]: OpenEnv
+        - heading "Agent 环境与基准ENVIRONMENT DESIGN · BENCHMARKS · OPENENV" [level=2] [ref=f1e12]
+        - paragraph [ref=f1e13]: Agent 必须在世界中行动、观察并调整,单次回复无法刻画其质量。环境就是 LLM 的 RL Gym——让探索安全、评估可复现、课程由易到难。
+      - generic [ref=f1e14]:
+        - generic [ref=f1e15]:
+          - generic [ref=f1e16]:
+            - generic [ref=f1e17]: "812"
+            - generic [ref=f1e18]: WebArena 任务·人 78% vs 45%
+          - generic [ref=f1e19]:
+            - generic [ref=f1e20]: 18%
+            - generic [ref=f1e21]: OSWorld SoTA·人类 72%
+          - generic [ref=f1e22]:
+            - generic [ref=f1e23]: "500"
+            - generic [ref=f1e24]: SWE-bench Verified 任务数
+          - generic [ref=f1e25]:
+            - generic [ref=f1e26]: 70+
+            - generic [ref=f1e27]: OpenEnv 生态环境(HF Spaces)
+        - generic [ref=f1e28]:
+          - generic [ref=f1e29]:
+            - generic [ref=f1e30]:
+              - generic [ref=f1e31]: 01环境为何必需
+              - generic [ref=f1e32]: 真实系统承受不起探索,基准要求同条件可复现,课程学习由易到难省样本——三者都需要结构化环境。
+            - generic [ref=f1e33]:
+              - generic [ref=f1e34]: 02四个设计轴
+              - generic [ref=f1e35]: 观察:文本/JSON/多模态;动作:工具·代码·GUI;奖励:对齐·可学习·抗作弊;Episode:定长/终止/开放。
+            - generic [ref=f1e36]:
+              - generic [ref=f1e37]: 03OpenEnv 标准接口
+              - generic [ref=f1e38]: Gymnasium 式 reset/step/state,动作与观察为强类型 dataclass;Docker 隔离,可从 HF Spaces 直接发现调用。
+          - generic [ref=f1e39]:
+            - img "Agent-环境循环:reset 开启 Episode,step 返回观察与奖励;七类环境与评测 harness 要点" [ref=f1e40]:
+              - generic [ref=f1e41]: AGENT–ENVIRONMENT LOOP · GYMNASIUM STYLE
+              - generic [ref=f1e44]: reset() → 初始观察
+              - generic [ref=f1e46]: LLM Agent
+              - generic [ref=f1e47]: 策略 π(a|o) · harness 循环
+              - generic [ref=f1e48]: 动作 = 工具调用 · 代码 · GUI
+              - generic [ref=f1e50]: 环境 Environment
+              - generic [ref=f1e51]: OpenEnv · Docker 隔离部署
+              - generic [ref=f1e52]: 强类型动作 / 观察
+              - generic [ref=f1e54]: step(action)
+              - generic [ref=f1e56]: observation · reward · done
+              - generic [ref=f1e57]: Episode:reset → step×T → done · 奖励多为执行判定 0/1
+              - generic [ref=f1e58]: 环境类型图谱 · SEVEN FAMILIES
+              - generic [ref=f1e59]:
+                - generic [ref=f1e61]: 代码沙箱
+                - generic [ref=f1e62]: E2B·Firecracker
+                - generic [ref=f1e63]: 启动 <200 ms
+                - generic [ref=f1e65]: Web
+                - generic [ref=f1e66]: WebArena
+                - generic [ref=f1e67]: 人 78% vs 45%
+                - generic [ref=f1e69]: 计算机使用
+                - generic [ref=f1e70]: OSWorld
+                - generic [ref=f1e71]: 人 72% vs 18%
+                - generic [ref=f1e73]: 软件工程
+                - generic [ref=f1e74]: SWE-bench
+                - generic [ref=f1e75]: 人 100% vs 50%
+                - generic [ref=f1e77]: 科研
+                - generic [ref=f1e78]: AI Scientist
+                - generic [ref=f1e79]: 假设→实验→论文
+                - generic [ref=f1e81]: 游戏仿真
+                - generic [ref=f1e82]: NLE·Voyager
+                - generic [ref=f1e83]: 技能库 + 课程
+                - generic [ref=f1e85]: 多 Agent
+                - generic [ref=f1e86]: AutoGen·辩论
+                - generic [ref=f1e87]: 协商·协作·博弈
+              - generic [ref=f1e89]: 评测 harness:环境级留出测试 · 人类基线定上界与校准 · 语义化版本 + 镜像摘要冻结
+              - generic [ref=f1e90]: 随机环境每任务 3-5 次运行 · N=500、p=0.4 时 95% CI ≈ ±4.3% · 种子确定性使轨迹可精确重放
+            - generic [ref=f1e91]: 图 21.1 · Agent-环境循环:reset 开启 Episode,step 返回观察与奖励;七类环境覆盖从代码沙箱到多 Agent 的能力谱
+        - generic [ref=f1e92]: 奖励工程首选基于执行的 0/1——跑测试即真值,对齐且抗作弊;警惕观察泄露:真值混入观察会虚高分数,部署即灾难性失败。
+      - img [ref=f1e94]:
+        - generic [ref=f1e96]: 为何需要
+        - generic [ref=f1e99]: 四设计轴
+        - generic [ref=f1e102]: 环境图谱
+        - generic [ref=f1e105]: OpenEnv
+        - generic [ref=f1e108]: 人类基线
+      - generic [ref=f1e111]:
+        - generic [ref=f1e112]: 《Agentic AI 指南》中文版 v1.1.0
+        - generic [ref=f1e113]: ·
+        - generic [ref=f1e114]: Part V 智能体
+        - generic [ref=f1e115]: p383-397
+    - generic:
+      - generic:
+        - generic:
+          - generic: PART V · CH 22
+          - generic: 书 p398-405
+          - generic: JSON-RPC 2.0
+          - generic: N×M→N+M
+        - heading "MCP:架构与原语HOST · CLIENT · SERVER · FOUR PRIMITIVES" [level=2]
+        - paragraph: 每个新框架都要重写一遍工具连接器。MCP(Anthropic 2024 开放标准)以 JSON-RPC 2.0 统一接口,把 N×M 定制集成压成 N+M——如 USB 之于设备。
+      - generic:
+        - generic:
+          - generic:
+            - generic: N+M
+            - generic: 20 框架×50 工具:1000→70(−14×)
+          - generic:
+            - generic: "4"
+            - generic: 原语 Tools·Resources·Prompts·Sampling
+          - generic:
+            - generic: "2"
+            - generic: 传输 stdio·Streamable HTTP
+          - generic:
+            - generic: "3"
+            - generic: 角色 Host·Client·Server
+        - generic:
+          - generic:
+            - generic:
+              - generic: 01工具集成问题
+              - generic: 每个框架×每个工具都要定制连接器,负担平方级增长;MCP 让各方只实现一次协议——类比 USB·HTTP·LSP。
+            - generic:
+              - generic: 02三角色模型
+              - generic: Host 管体验与安全策略,内含一或多个 Client;Client 与单个 Server 一对一有状态会话;Server 是既有 API 的薄包装。
+            - generic:
+              - generic: 03生命周期与传输
+              - generic: 四阶段:initialize→能力协商→运行→关闭;传输 stdio(本地子进程)或 Streamable HTTP(可升级 SSE 流)。
+          - generic:
+            - img "MCP 架构:Host 内多个 Client 经 stdio 或 Streamable HTTP 与多个 Server 保持有状态会话,右侧为四大原语":
+              - generic: MCP ARCHITECTURE · STATEFUL SESSIONS
+              - generic: MCP HOST · 用户同意 · 安全策略 · 审计日志
+              - generic: LLM —— 决定调用哪个工具 · 整理结果
+              - generic: MCP Client
+              - generic: 与单个 Server 一对一
+              - generic: MCP Client
+              - generic: 协议协商·序列化
+              - generic: MCP Client
+              - generic: 连接生命周期管理
+              - generic: stdio
+              - generic: stdio
+              - generic: Streamable HTTP
+              - generic: 文件系统 Server
+              - generic: 本地 I/O·薄包装
+              - generic: GitHub Server
+              - generic: Issue·PR·提交历史
+              - generic: Postgres Server
+              - generic: 只读 SQL 查询
+              - generic: 四大原语 PRIMITIVES
+              - generic: Tools
+              - generic: C→S
+              - generic: LLM 调用·带副作用
+              - generic: Resources
+              - generic: C←S
+              - generic: 上下文数据·URI·订阅
+              - generic: Prompts
+              - generic: C←S
+              - generic: 可复用 prompt 模板
+              - generic: Sampling
+              - generic: S→C
+              - generic: Server 请求 Host 推理
+              - generic: 线协议 JSON-RPC 2.0:Request(期待响应) · Response · Notification(无 id 单向通知)
+              - generic: 工具发现:tools/list 动态注册 · inputSchema=JSON Schema · name+description 决定 LLM 选哪个工具
+            - generic: 图 22.2 · MCP 架构:Host 内多个 Client 与多个 Server 保持有状态会话;Server 包装外部服务,经 stdio 或 Streamable HTTP 传输
+        - generic: Sampling 反转唯一方向相反的原语:Server 请求 Host 执行一次 LLM 推理,Host 保留完全控制权——server 无需自备模型。
+      - generic:
+        - img:
+          - generic: 集成爆炸
+          - generic: 三角色
+          - generic: 传输层
+          - generic: 四原语
+          - generic: JSON-RPC
+      - generic:
+        - generic: 《Agentic AI 指南》中文版 v1.1.0
+        - generic: ·
+        - generic: Part V 智能体
+        - generic: p398-405
+    - generic:
+      - generic:
+        - generic:
+          - generic: PART V · CH 22
+          - generic: 书 p406-416
+          - generic: FastMCP
+          - generic: OAuth 2.0
+        - heading "MCP:安全·生态·训练SECURITY · ECOSYSTEM · RL & SFT" [level=2]
+        - paragraph: MCP 运行在分层信任之上:Host 执行同意,Server 条件信任。对训练者,它更是标准化的动作空间与轨迹来源——LLM 时代的 gymnasium。
+      - generic:
+        - generic:
+          - generic:
+            - generic: 4 层
+            - generic: 信任 Host>Client>Server>外部
+          - generic:
+            - generic: "10"
+            - generic: 表 22.1 代表性官方 Server
+          - generic:
+            - generic: 2^n
+            - generic: 重连退避 wait=base·2^attempt
+          - generic:
+            - generic: "0.8"
+            - generic: 工具结果可编码 reward 信号
+        - generic:
+          - generic:
+            - generic: 01信任层级·用户同意
+            - generic: Host 最高信任并执行用户同意;Server 条件信任,resource 可夹带注入;凭据走 OAuth 2.0 与密钥管理,最小权限。
+          - generic:
+            - generic: 02最小 Server·多连接
+            - generic: FastMCP 由类型注解+docstring 自动生成 schema;多 Server 用连接池统一注册路由;崩溃后按 2^n 退避重连。
+          - generic:
+            - generic: 03训练:动作空间与轨迹
+            - generic: tools/list 即动作空间,resources 即观测,工具结果可携带 reward;轨迹记录中间件一键转成 chat 格式 SFT 样本。
+        - generic:
+          - table:
+            - rowgroup:
+              - row "场景 选 MCP 选自定义集成":
+                - columnheader "场景"
+                - columnheader "选 MCP"
+                - columnheader "选自定义集成"
+            - rowgroup:
+              - row "多厂商 / 多框架协同 一次实现,跨厂商即插 锁定单一提供方":
+                - cell "多厂商 / 多框架协同"
+                - cell "一次实现,跨厂商即插"
+                - cell "锁定单一提供方"
+              - row "工具分发给他人使用 开放标准 + 生态注册表 自建分发与维护":
+                - cell "工具分发给他人使用"
+                - cell "开放标准 + 生态注册表"
+                - cell "自建分发与维护"
+              - row "需会话·订阅·推送 协议原生支持 需自行实现":
+                - cell "需会话·订阅·推送"
+                - cell "协议原生支持"
+                - cell "需自行实现"
+              - row "延迟敏感·接口特殊 协议开销难承受 直连更快更省":
+                - cell "延迟敏感·接口特殊"
+                - cell "协议开销难承受"
+                - cell "直连更快更省"
+          - generic:
+            - generic: "@mcp.tool() def create_note(title: str, content: str) -> str: \"\"\"Create a note.\"\"\" # docstring 即给 LLM 的描述 # inputSchema 由类型注解自动生成 · mcp.run() 自选传输"
+            - generic:
+              - generic: 生态与注册表
+              - generic: 官方 MCP Registry 精选 + npm/PyPI 分发;Claude Desktop、Cursor、VS Code Copilot 均已原生接入。
+        - generic: 头号攻击面经 Resource 的 prompt 注入:上下文里的「忽略此前指令」可能被执行——数据标记为不可信,破坏性操作强制用户确认。
+      - generic:
+        - img:
+          - generic: 信任层级
+          - generic: 用户同意
+          - generic: FastMCP
+          - generic: 生态
+          - generic: SFT 轨迹
+      - generic:
+        - generic: 《Agentic AI 指南》中文版 v1.1.0
+        - generic: ·
+        - generic: Part V 智能体
+        - generic: p406-416
+  - generic [ref=f1e116]: PART V · CH 21 · Agent 环境与基准
+  - generic [ref=f1e117]: ← → 翻页 · T 目录 · F 全屏
+  - generic [ref=f1e118]:
+    - generic [ref=f1e119]: 01 / 03
+    - generic [ref=f1e120] [cursor=pointer]: 目录
+    - generic [ref=f1e121] [cursor=pointer]: 全屏
+  - generic [aria-hidden] [ref=f1e123] [cursor=pointer]
+  - generic [aria-hidden] [ref=f1e124] [cursor=pointer]

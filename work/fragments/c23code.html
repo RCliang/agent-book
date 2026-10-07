@@ -1,0 +1,49 @@
+<!-- ▸ c23code · 代码实战:生产级 Agent Harness 骨架(Listing 18.1) -->
+<section class="slide codeslide" id="c23code" data-part="5" data-crumb="PART V · 代码 18" data-title="Harness 骨架">
+  <header class="s-head">
+    <div class="k-eyebrow"><span class="tag am">CODE</span><span class="dim">Listing 18.1 · 书 p356-363</span><span class="tag c">Python</span><span class="tag c">asyncio</span></div>
+    <h2 class="k-h">生产级 Agent Harness 骨架<span class="en">CONTEXT BUDGET · TOOL DISPATCH · REACT LOOP</span></h2>
+    <p class="k-lede">书 18.10:system 消息与四段 token 预算、按名分发的工具执行器、ReAct 主循环——模型→解析工具调用→执行→回填观测,四重终止条件兜底,永不静默死循环。</p>
+  </header>
+  <div class="s-body">
+    <div class="split-58">
+      <div class="k-code tall fu" style="--d:.05s"><pre><span class="k">class</span> AgentHarness:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="k">self</span>, model, system_prompt, tools, approval_cb=<span class="k">None</span>):
+        <span class="f">self.executor</span> = <span class="f">ToolExecutor</span>(tools, approval_cb)  <span class="c">① 工具分发表</span>
+        <span class="f">self.ctx_mgr</span> = <span class="f">ContextManager</span>(model, max_tokens=<span class="k">128_000</span>)
+        <span class="f">self.ctx_mgr</span>.system_msg = <span class="f">Message</span>(Role.SYSTEM, system_prompt)
+    <span class="k">async def</span> <span class="f">run</span>(<span class="k">self</span>, user_input: <span class="k">str</span>) -&gt; <span class="k">str</span>:  <span class="c"># user 消息先入 context</span>
+        tool_defs = [t.<span class="f">to_api_dict</span>() <span class="k">for</span> t <span class="k">in</span> <span class="f">self.tools</span>]
+        tool_tokens = <span class="f">sum</span>(<span class="f">self.ctx_mgr.count_tokens</span>(  <span class="c">② 组装时计预算</span>
+            json.<span class="f">dumps</span>(t)) <span class="k">for</span> t <span class="k">in</span> tool_defs)
+        <span class="k">for</span> iteration <span class="k">in</span> <span class="f">range</span>(<span class="f">self.MAX_ITERATIONS</span>):  <span class="c"># 硬上限 50</span>
+            <span class="k">if</span> <span class="k">not</span> <span class="f">self.ctx_mgr.preflight_check</span>(tool_tokens):
+                <span class="k">return</span> <span class="s">"I've run out of context space."</span>  <span class="c">③ 每轮预算闸</span>
+            response = <span class="k">await</span> <span class="f">self.client.chat.completions.create</span>(
+                model=<span class="f">self.model</span>, messages=<span class="f">self.ctx_mgr.build_messages</span>(),
+                tools=tool_defs, tool_choice=<span class="s">"auto"</span>, temperature=<span class="k">0.0</span>)
+            choice = response.choices[<span class="k">0</span>]
+            <span class="k">if</span> choice.finish_reason == <span class="s">"stop"</span> <span class="k">or</span> <span class="k">not</span> choice.message.tool_calls:
+                <span class="k">return</span> choice.message.content <span class="k">or</span> <span class="s">"Task complete."</span>  <span class="c">④ 终止</span>
+            results = <span class="k">await</span> <span class="f">self._execute_tool_calls</span>(choice.message.tool_calls)
+            <span class="k">for</span> tid, result <span class="k">in</span> results.<span class="f">items</span>():  <span class="c">⑤ 观测回填</span>
+                <span class="f">self.ctx_mgr.add_message</span>(<span class="f">Message</span>(
+                    Role.TOOL, result, tool_call_id=tid))</pre></div>
+      <div class="col">
+        <div class="k-card fu" style="--d:.15s"><div class="k-card-t"><span class="no">①</span>工具分发表</div><div class="k-card-b">ToolExecutor 以 {name: 定义} 建表,按模型给出的名字分发执行——工具多也不乱。</div></div>
+        <div class="k-card fu" style="--d:.22s"><div class="k-card-t"><span class="no">②③</span>预算为何在组装时算</div><div class="k-card-b">工具 Schema 开始时序列化计数一次,每轮 preflight 复核——预算前置,防静默溢出。</div></div>
+        <div class="k-card fu" style="--d:.29s"><div class="k-card-t"><span class="no">④</span>循环终止条件</div><div class="k-card-b">终止:stop 或无 tool_calls 正常返回;预算溢出坦白求新会话;LoopDetector 断死循环。</div></div>
+        <div class="k-card fu" style="--d:.36s"><div class="k-card-t"><span class="no">⑤</span>观测回填要「对位」</div><div class="k-card-b">结果以 role=TOOL + tool_call_id 与调用一一配对回填;多工具 gather 并行。</div></div>
+      </div>
+    </div>
+    <div class="k-callout g fu" style="--d:.42s"><b>运行</b>依赖 openai sdk;预期:模型按需调用工具、观测回填后继续,直至 stop 终止。</div>
+  </div>
+  <div class="route"><svg viewBox="0 0 1160 80" preserveAspectRatio="xMidYMid meet">
+    <path class="route-path" pathLength="1" d="M20,44 C160,12 300,72 440,44 S760,10 900,40 S1080,58 1140,44"/>
+    <g class="rn" style="--d:.3s"><circle cx="160" cy="32" r="4.5"/><text x="122" y="16">system 组装</text></g>
+    <g class="rn" style="--d:.55s"><circle cx="400" cy="50" r="4.5"/><text x="374" y="70">工具分发</text></g>
+    <g class="rn" style="--d:.8s"><circle cx="640" cy="30" r="4.5"/><text x="620" y="14">预算闸</text></g>
+    <g class="rn" style="--d:1.05s"><circle cx="880" cy="44" r="4.5"/><text x="848" y="66">回填观测</text></g>
+  </svg></div>
+  <footer class="s-foot"><span>《Agentic AI 指南》中文版 v1.1.0</span><span class="dot">·</span><span>Part V 智能体 · 代码</span><span class="pg">p356-363</span></footer>
+</section>
